@@ -210,7 +210,7 @@ class EleveSpaceController extends Controller
     {
         $eleve    = $this->monProfil();
         $requetes = $eleve->requetes()->with('traitePar')->latest()->paginate(10);
-        return view('eleve.requetes', compact('eleve', 'requetes'));
+        return view('eleve.requete', compact('eleve', 'requetes'));
     }
 
     public function storeRequete(Request $request)

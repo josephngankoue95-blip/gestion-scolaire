@@ -2,6 +2,7 @@
 namespace App\Http\Controllers\Prefet;
 
 use App\Http\Controllers\Controller;
+use App\Models\TravailDirige;
 use App\Models\ClasseModel;
 use App\Models\Enseignant;
 use App\Models\Sequence;
@@ -144,4 +145,67 @@ class PrefetController extends Controller
         return redirect()->route('prefet.saisie.index')
             ->with('success', 'Notes enregistrées avec succès (saisie effectuée par la préfecture des études).');
     }
+
+/** Vue détaillée des notes saisies par un enseignant pour vérification (lecture seule) */
+public function controlerSaisie(Request $request)
+{
+    $request->validate([
+        'classe_id'   => 'required|exists:classes,id',
+        'matiere_id'  => 'required|exists:matieres,id',
+        'sequence_id' => 'required|exists:sequences,id',
+    ]);
+
+    $classe   = ClasseModel::with('section')->findOrFail($request->classe_id);
+    $matiere  = Matiere::findOrFail($request->matiere_id);
+    $sequence = Sequence::with('trimestre')->findOrFail($request->sequence_id);
+
+    $eleves = $classe->eleves()->orderBy('nom')->get();
+
+    $notes = Note::where('classe_id', $classe->id)
+        ->where('matiere_id', $matiere->id)
+        ->where('sequence_id', $sequence->id)
+        ->get()
+        ->keyBy('eleve_id');
+
+    $affectation = \App\Models\Affectation::where('classe_id', $classe->id)
+        ->where('matiere_id', $matiere->id)
+        ->with('enseignant.user')
+        ->first();
+
+    return view('prefet.saisie.controle', compact('classe', 'matiere', 'sequence', 'eleves', 'notes', 'affectation'));
+}
+
+/** Liste de tous les TD publiés, tous enseignants confondus (consultation + impression) */
+public function travauxDiriges(Request $request)
+{
+    $annee = AnneeScolaire::getActive();
+
+    $query = TravailDirige::where('annee_scolaire_id', $annee?->id)
+        ->with('matiere', 'classe.section', 'enseignant.user');
+
+    if ($request->filled('classe_id')) $query->where('classe_id', $request->classe_id);
+    if ($request->filled('enseignant_id')) $query->where('enseignant_id', $request->enseignant_id);
+
+    $travaux = $query->latest()->paginate(15);
+
+    $classes     = ClasseModel::where('annee_scolaire_id', $annee?->id)->orderBy('nom')->get();
+    $enseignants = \App\Models\Enseignant::with('user')->where('statut','actif')->get();
+
+    return view('prefet.travaux.index', compact('travaux', 'classes', 'enseignants'));
+}
+
+public function voirTravail(TravailDirige $travailDirige)
+{
+    return view('prefet.travaux.show', compact('travailDirige'));
+}
+
+public function imprimerTravail(TravailDirige $travailDirige)
+{
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('prefet.travaux.pdf', [
+        'travailDirige' => $travailDirige,
+        'etablissement' => \App\Models\Etablissement::instance(),
+    ])->setPaper('a4', 'portrait');
+
+    return $pdf->stream("TD_{$travailDirige->titre}.pdf");
+}
 }

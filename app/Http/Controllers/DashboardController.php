@@ -27,8 +27,10 @@ class DashboardController extends Controller
     if ($user->hasRole('enseignant'))          return $this->dashboardEnseignant($user);
     if ($user->hasRole('surveillant_general')) return $this->dashboardSurveillant();
     if ($user->hasRole('secretaire_intendant'))return redirect()->route('secretaire.dashboard');
+    if ($user->hasRole('bibliothecaire'))      return redirect()->route('bibliotheque.dashboard');
     if ($user->hasRole('parent'))              return redirect()->route('parent.dashboard');
     if ($user->hasRole('prefet_etudes'))       return redirect()->route('prefet.dashboard');
+    if ($user->hasRole('eleve'))               return redirect()->route('eleve.dashboard');
        
     abort(403, "Aucun rôle valide n'est assigné à ce compte.");
     return view('dashboard.default');

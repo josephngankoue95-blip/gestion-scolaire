@@ -156,7 +156,7 @@
 <section style="background:linear-gradient(135deg,#123018,#0d2440);padding:60px 24px;text-align:center;color:#fff;">
     <h2 style="font-size:24px;font-weight:800;margin-bottom:10px;">Prêt à rejoindre notre établissement ?</h2>
     <p style="color:#dbe9ff;font-size:14px;margin-bottom:26px;">Consultez les conditions d'admission et déposez votre dossier dès aujourd'hui.</p>
-    <a href="{{ route('public.admissions') }}" style="background:#fff;color:#1a3a6b;padding:13px 30px;border-radius:10px;font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:8px;">
+    <a href="{{ route('public.candidature.create') }}" style="background:#fff;color:#1a3a6b;padding:13px 30px;border-radius:10px;font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:8px;">
         Voir les admissions <i data-lucide="arrow-right" class="w-4 h-4"></i>
     </a>
 </section>

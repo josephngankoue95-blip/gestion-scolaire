@@ -50,9 +50,9 @@ use App\Http\Controllers\Teacher\TravailDirigeController;
 
 //Gestion des utilisateurs
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('users/eleves-par-classe', [UserController::class, 'elevesByClasse'])->name('users.elevesByClasse');
     Route::resource('users', UserController::class);
     Route::post('users/{user}/toggle-actif', [UserController::class, 'toggleActif'])->name('users.toggle');
-    Route::get('users/eleves-par-classe', [UserController::class, 'elevesByClasse'])->name('users.elevesByClasse');
 });
 
 /**PROVISEUR */
@@ -167,16 +167,14 @@ Route::middleware(['auth','role:admin|secretaire_intendant|prefecture_etudes'])-
 
 /**TRAVAUX DIRIGES */
 Route::middleware(['auth','role:enseignant'])->prefix('teacher')->name('teacher.')->group(function () {
-    Route::resource('td', TravailDirigeController::class)->except(['index'])->names([
-        'create'  => 'td.create',
-        'store'   => 'td.store',
-        'show'    => 'td.show',
-        'edit'    => 'td.edit',
-        'update'  => 'td.update',
-        'destroy' => 'td.destroy',
-    ]);
-    Route::get('td', [TravailDirigeController::class, 'index'])->name('td.index');
-}); 
+    Route::get('td', [\App\Http\Controllers\Teacher\TravailDirigeController::class, 'index'])->name('td.index');
+    Route::get('td/create', [\App\Http\Controllers\Teacher\TravailDirigeController::class, 'create'])->name('td.create');
+    Route::post('td', [\App\Http\Controllers\Teacher\TravailDirigeController::class, 'store'])->name('td.store');
+    Route::get('td/{travailDirige}', [\App\Http\Controllers\Teacher\TravailDirigeController::class, 'show'])->name('td.show');
+    Route::get('td/{travailDirige}/edit', [\App\Http\Controllers\Teacher\TravailDirigeController::class, 'edit'])->name('td.edit');
+    Route::put('td/{travailDirige}', [\App\Http\Controllers\Teacher\TravailDirigeController::class, 'update'])->name('td.update');
+    Route::delete('td/{travailDirige}', [\App\Http\Controllers\Teacher\TravailDirigeController::class, 'destroy'])->name('td.destroy');
+});
 
 // Accessible aussi par les parents (via route publique auth)
 Route::middleware(['auth'])->get('td/{travailDirige}/consulter', [TravailDirigeController::class, 'consulter'])->name('td.consulter');
@@ -442,6 +440,11 @@ Route::middleware(['auth', 'role:prefet_etudes'])->prefix('prefet')->name('prefe
     Route::get('saisie/form', [PrefetController::class, 'saisieForm'])->name('saisie.form');
     Route::post('saisie', [PrefetController::class, 'saisieStore'])->name('saisie.store');
     Route::get('ajax/matieres', [PrefetController::class, 'ajaxMatieres'])->name('ajax.matieres');
+    Route::get('saisie/controle', [PrefetController::class, 'controlerSaisie'])->name('saisie.controle');
+
+    Route::get('travaux', [PrefetController::class, 'travauxDiriges'])->name('travaux.index');
+    Route::get('travaux/{travailDirige}', [PrefetController::class, 'voirTravail'])->name('travaux.show');
+    Route::get('travaux/{travailDirige}/imprimer', [PrefetController::class, 'imprimerTravail'])->name('travaux.imprimer');
 });
 
 // Accès partagés avec l'admin (bulletins, tableau d'honneur, cartes scolaires, procès-verbaux)
