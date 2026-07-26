@@ -24,6 +24,9 @@
             <a href="{{ route('prefet.travaux.index') }}" class="sidebar-link {{ request()->routeIs('prefet.travaux.*') ? 'sidebar-link-active' : '' }}">
                 <i data-lucide="book-marked" class="w-5 h-5"></i> Travaux Dirigés
             </a>
+            <a href="{{ route('prefet.epreuves.index') }}" class="sidebar-link {{ request()->routeIs('prefet.epreuves.*') ? 'sidebar-link-active' : '' }}">
+                <i data-lucide="file-check-2" class="w-5 h-5"></i> Épreuves de composition
+            </a>
             <a href="{{ route('prefet.saisie.index') }}" class="sidebar-link {{ request()->routeIs('prefet.saisie.*') ? 'sidebar-link-active' : '' }}">
                 <i data-lucide="pencil-line" class="w-5 h-5"></i> Saisir des notes
             </a>

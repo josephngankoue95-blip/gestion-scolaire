@@ -13,6 +13,9 @@ return new class extends Migration
             $table->date('date_debut');
             $table->date('date_fin');
             $table->boolean('active')->default(false);
+            if (!Schema::hasColumn('annees_scolaires', 'initialisee')) {
+                $table->boolean('initialisee')->default(false)->after('active');
+            }
             $table->timestamps();
         });
     }

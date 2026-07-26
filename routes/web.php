@@ -42,6 +42,7 @@ use App\Http\Controllers\Parent\PaiementMobileController;
 use App\Http\Controllers\Admin\PaiementMobileAdminController;
 use App\Http\Controllers\Public\SitePublicController;
 use App\Http\Controllers\Admin\EvenementController;
+use App\Http\Controllers\Admin\EpreuveExterneController;
 
 //Notes & Bulletins
 use App\Http\Controllers\Teacher\SaisieNoteController;
@@ -215,7 +216,7 @@ Route::name('public.')->group(function () {
     Route::get('/', [SitePublicController::class, 'accueil'])->name('home');
     Route::get('/secondaire', [SitePublicController::class, 'secondaire'])->name('secondaire');
     Route::get('/universite', [SitePublicController::class, 'universite'])->name('universite');
-    Route::get('/admissions', [SitePublicController::class, 'admissions'])->name('admissions');
+
     Route::get('/contact', [SitePublicController::class, 'contact'])->name('contact');
 });
 
@@ -265,6 +266,11 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
 });
 
+/**Epreuves Enseignants */
+Route::middleware(['auth','role:enseignant'])->prefix('teacher')->name('teacher.')->group(function () {
+    Route::resource('epreuves', \App\Http\Controllers\Teacher\EpreuveCompositionController::class)->only(['index','create','store','destroy']);
+});
+
 /**CompteGeneration */
 Route::middleware(['auth','role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('comptes-generes', [CompteGenereController::class, 'index'])->name('comptes-generes.index');
@@ -286,20 +292,21 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 // Espace élève
 Route::middleware(['auth', 'role:eleve'])->prefix('eleve')->name('eleve.')->group(function () {
     Route::get('dashboard', [EleveSpaceController::class, 'dashboard'])->name('dashboard');
-
     Route::get('bulletins', [EleveSpaceController::class, 'bulletins'])->name('bulletins');
     Route::get('bulletins/voir', [EleveSpaceController::class, 'voirBulletin'])->name('bulletins.voir');
-
     Route::get('emploi-du-temps', [EleveSpaceController::class, 'emploiDuTemps'])->name('emploi-du-temps');
 
-    Route::get('travaux', [EleveSpaceController::class, 'travaux'])->name('travaux');
-    Route::get('travaux/{travailDirige}', [EleveSpaceController::class, 'voirTravail'])->name('travaux.show');
+    Route::get('epreuves', [EleveSpaceController::class, 'epreuves'])->name('epreuves'); // ← remplace travaux
 
     Route::get('requetes', [EleveSpaceController::class, 'requetes'])->name('requetes');
     Route::post('requetes', [EleveSpaceController::class, 'storeRequete'])->name('requetes.store');
-
     Route::get('profil', [EleveSpaceController::class, 'profil'])->name('profil');
     Route::post('profil', [EleveSpaceController::class, 'updateProfil'])->name('profil.update');
+});
+
+/**Lien Epreuve */
+Route::middleware(['auth','role:admin|enseignant'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('epreuves-externes', \App\Http\Controllers\Admin\EpreuveExterneController::class)->except(['show']);
 });
 
 // Gestion requêtes côté admin/secrétaire
@@ -445,6 +452,9 @@ Route::middleware(['auth', 'role:prefet_etudes'])->prefix('prefet')->name('prefe
     Route::get('travaux', [PrefetController::class, 'travauxDiriges'])->name('travaux.index');
     Route::get('travaux/{travailDirige}', [PrefetController::class, 'voirTravail'])->name('travaux.show');
     Route::get('travaux/{travailDirige}/imprimer', [PrefetController::class, 'imprimerTravail'])->name('travaux.imprimer');
+    Route::get('epreuves', [PrefetController::class, 'epreuves'])->name('epreuves.index');
+    Route::get('epreuves/{epreuve}', [PrefetController::class, 'voirEpreuve'])->name('epreuves.show');
+    Route::get('epreuves/{epreuve}/imprimer', [PrefetController::class, 'imprimerEpreuve'])->name('epreuves.imprimer');
 });
 
 // Accès partagés avec l'admin (bulletins, tableau d'honneur, cartes scolaires, procès-verbaux)

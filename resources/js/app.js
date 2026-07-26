@@ -1,4 +1,5 @@
 import './bootstrap';
+import './confirm-delete-modal.js';
 
 import Alpine from 'alpinejs';
 

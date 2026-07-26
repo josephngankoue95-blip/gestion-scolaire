@@ -3016,3 +3016,58 @@ textarea:focus {
         padding: 40px 16px;
     }
 }
+
+.gdm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.55);
+    z-index: 9999;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity .2s ease;
+}
+.gdm-overlay.gdm-open { opacity: 1; }
+
+.gdm-box {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px;
+    max-width: 380px;
+    width: 90%;
+    text-align: center;
+    transform: scale(.92) translateY(10px);
+    transition: transform .2s ease;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+}
+.gdm-overlay.gdm-open .gdm-box { transform: scale(1) translateY(0); }
+
+.gdm-icon {
+    width: 56px; height: 56px;
+    background: #fef2f2;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 16px;
+}
+.gdm-icon i { width: 26px; height: 26px; color: #dc2626; }
+
+.gdm-title { font-size: 17px; font-weight: 700; color: #111; margin-bottom: 8px; }
+.gdm-text { font-size: 13.5px; color: #6b7280; line-height: 1.5; margin-bottom: 22px; }
+
+.gdm-actions { display: flex; gap: 10px; }
+.gdm-btn {
+    flex: 1;
+    padding: 11px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 13.5px;
+    border: none;
+    cursor: pointer;
+    transition: transform .15s ease, opacity .15s ease;
+}
+.gdm-btn:hover { transform: translateY(-1px); }
+.gdm-btn-cancel { background: #f3f4f6; color: #374151; }
+.gdm-btn-cancel:hover { background: #e5e7eb; }
+.gdm-btn-confirm { background: #dc2626; color: #fff; }
+.gdm-btn-confirm:hover { background: #b91c1c; }

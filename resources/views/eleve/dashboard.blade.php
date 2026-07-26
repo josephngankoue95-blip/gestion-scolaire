@@ -87,10 +87,8 @@
                 <i data-lucide="calendar-clock" style="width:26px;height:26px;margin:0 auto 6px;display:block;color:#1a7a1a;"></i>
                 <p style="font-size:12px;font-weight:bold;">Emploi du temps</p>
             </a>
-            <a href="{{ route('eleve.travaux') }}" class="card-hover" style="text-align:center;padding:14px;">
-                <i data-lucide="book-marked" style="width:26px;height:26px;margin:0 auto 6px;display:block;color:#e67e22;"></i>
-                <p style="font-size:12px;font-weight:bold;">Mes TD</p>
-                @if($tdActifs > 0)<span class="badge-green" style="font-size:10px;">{{ $tdActifs }} actif(s)</span>@endif
+            <a href="{{ route('eleve.epreuves') }}" class="sidebar-link {{ request()->routeIs('eleve.epreuves') ? 'sidebar-link-active' : '' }}">
+                <i data-lucide="file-search" class="w-5 h-5"></i> Épreuves d'examens 
             </a>
             <a href="{{ route('eleve.profil') }}" class="card-hover" style="text-align:center;padding:14px;">
                 <i data-lucide="user" style="width:26px;height:26px;margin:0 auto 6px;display:block;color:#9333ea;"></i>

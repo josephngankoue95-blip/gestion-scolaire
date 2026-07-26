@@ -2,6 +2,8 @@
 namespace App\Http\Controllers\Prefet;
 
 use App\Http\Controllers\Controller;
+use App\Models\EpreuveExterne;
+use App\Models\EpreuveComposition;
 use App\Models\TravailDirige;
 use App\Models\ClasseModel;
 use App\Models\Enseignant;
@@ -208,4 +210,25 @@ public function imprimerTravail(TravailDirige $travailDirige)
 
     return $pdf->stream("TD_{$travailDirige->titre}.pdf");
 }
+
+// PrefetController — ajout
+
+public function epreuves(Request $request)
+{
+    $annee = AnneeScolaire::getActive();
+
+    $query = \App\Models\EpreuveComposition::where('annee_scolaire_id', $annee?->id)
+        ->with('matiere', 'classe.section', 'enseignant.user', 'sequence.trimestre');
+
+    if ($request->filled('classe_id')) $query->where('classe_id', $request->classe_id);
+    if ($request->filled('sequence_id')) $query->where('sequence_id', $request->sequence_id);
+
+    $epreuves = $query->latest()->paginate(20);
+
+    $classes   = ClasseModel::where('annee_scolaire_id', $annee?->id)->orderBy('nom')->get();
+    $sequences = Sequence::whereHas('trimestre', fn($q) => $q->where('annee_scolaire_id', $annee?->id))->orderBy('numero')->get();
+
+    return view('prefet.epreuves.index', compact('epreuves', 'classes', 'sequences'));
+}
+
 }

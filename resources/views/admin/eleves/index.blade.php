@@ -89,19 +89,16 @@
                                     </span>
                                 </a>
 
-                                <form action="{{ route('admin.eleves.destroy', $eleve) }}"
-                                      method="POST"
-                                      class="inline"
-                                      onsubmit="return confirm('Supprimer cet élève ?')">
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button type="submit" title="Supprimer">
-                                        <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition">
-                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                        </span>
-                                    </button>
-                                </form>
+                        <form method="POST" action="{{ route('admin.eleves.destroy', $eleve) }}"
+                            data-confirm-delete
+                            data-confirm-message="Supprimer {{ $eleve->nomComplet() }} ? Cette action est irréversible.">
+                            @csrf @method('DELETE')
+                            <button type="button" class="text-red-500" onclick="this.closest('form').requestSubmit()">
+                                <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </span>
+                            </button>
+                        </form>
                             </div>
                         </td>
                     </tr>

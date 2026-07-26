@@ -252,4 +252,18 @@ class EleveSpaceController extends Controller
 
         return back()->with('success', 'Mot de passe mis à jour.');
     }
+
+public function epreuves()
+{
+    $eleve     = $this->monProfil();
+    $scolarite = $eleve->scolariteActive();
+    $niveau    = $scolarite?->classe?->niveau?->nom;
+
+    $epreuves = \App\Models\EpreuveExterne::where('actif', true)
+        ->when($niveau, fn($q) => $q->where(fn($q2) => $q2->where('niveau', $niveau)->orWhereNull('niveau')))
+        ->orderBy('ordre')
+        ->get();
+
+    return view('eleve.epreuves', compact('eleve', 'epreuves'));
+}
 }

@@ -83,14 +83,14 @@
     </a>
     @endrole
 
-    @role('admin|bibliothecaire')
+    @role('bibliothecaire')
     <a href="{{ route('bibliotheque.dashboard') }}" class="sidebar-link {{ request()->routeIs('bibliotheque.*') ? 'sidebar-link-active' : '' }}">
         <i data-lucide="book" class="w-5 h-5"></i> Bibliothèque
     </a>
     @endrole
 
     {{-- Sidebar admin — ajout du lien Conseils de classe --}}
-    @role('admin|proviseur|prefet_etudes')
+    @role('admin|prefecture_etudes')
     <a href="{{ route('admin.conseils.index') }}" class="sidebar-link {{ request()->routeIs('admin.conseils.*') ? 'sidebar-link-active' : '' }}">
         <i data-lucide="gavel" class="w-5 h-5"></i> Conseils de classe
     </a>
@@ -103,7 +103,7 @@
     <a href="{{ route('admin.enseignants.index') }}" class="sidebar-link {{ request()->routeIs('admin.enseignants.*') ? 'sidebar-link-active' : '' }}">
         <i data-lucide="user-check" class="w-5 h-5"></i> Enseignants
     </a>
-
+    
     <a href="{{ route('admin.releves.index') }}" class="sidebar-link {{ request()->routeIs('admin.releves.*') ? 'sidebar-link-active' : '' }}">
         <i data-lucide="clipboard" class="w-5 h-5"></i> Relevés de notes
     </a>
@@ -116,6 +116,16 @@
         <i data-lucide="file-text" class="w-5 h-5"></i> Travaux dirigés
     </a>
     @endrole
+
+    <!-- @role('admin')
+    <p class="sidebar-section-title">Epreuves en Ligne</p>
+
+    <a href="{{ route('admin.epreuves-externes.index') }}"
+    class="sidebar-link {{ request()->routeIs('admin.epreuves-externes.*') ? 'sidebar-link-active' : '' }}">
+        <i data-lucide="calendar-x" class="w-5 h-5"></i>
+        Epreuves en ligne
+    </a>
+    @endrole -->
 
     {{--====================SURVEILLANT================ --}}
 @role('admin|surveillant_general')
@@ -179,6 +189,9 @@
     @role('enseignant')
     <p class="sidebar-section-title">Mon espace</p>
 
+    <a href="{{ route('teacher.epreuves.index') }}" class="sidebar-link">
+       <i data-lucide="file-plus" class="w-5 h-5"></i> Épreuves de composition
+    </a>
     <a href="{{ route('teacher.saisie.index') }}" class="sidebar-link {{ request()->routeIs('teacher.saisie.*') ? 'sidebar-link-active' : '' }}">
         <i data-lucide="pencil-line" class="w-5 h-5"></i> Saisie des notes
     </a>

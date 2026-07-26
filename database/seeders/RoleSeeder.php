@@ -16,6 +16,7 @@ class RoleSeeder extends Seeder
             'surveillant_general',
             'secretaire_intendant',
             'parent',
+            'eleve',
             'bibliothecaire',
         ];
 

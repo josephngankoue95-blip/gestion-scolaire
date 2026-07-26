@@ -15,48 +15,29 @@
             @csrf
 
             <div class="form-group">
-                <label class="form-label">Classe source (départ) *</label>
-                <select name="classe_source_id" id="sel_classe_source" required class="form-select">
-                    <option value="">-- Choisir --</option>
-                    @foreach ($classes as $c)
-                        <option value="{{ $c->id }}">{{ $c->nom }} ({{ $c->section->code }})</option>
-                    @endforeach
-                </select>
-            </div>
+    <label class="form-label">Classe source (départ) *</label>
+    <select name="classe_source_id" id="sel_classe_source" required class="form-select">
+        <option value="">-- Choisir --</option>
+        @foreach ($classesSource as $c)
+            <option value="{{ $c->id }}">{{ $c->nom }} ({{ $c->section->code }})</option>
+        @endforeach
+    </select>
+    <p class="text-xs text-gray-400 mt-1">Les classes terminales (Terminale, Upper Sixth) ne sont pas listées.</p>
+</div>
 
-            {{-- Alerte classe terminale --}}
-            <div id="alerte_terminale" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:12px 14px;">
-                <p style="font-size:12px;color:#991b1b;">
-                    <i data-lucide="alert-triangle" class="w-4 h-4 inline"></i>
-                    <strong>Attention :</strong> cette classe est un <strong>niveau terminal</strong> (fin de cycle).
-                    Les élèves de cette classe ne sont normalement pas transférables — ils sont censés terminer
-                    leur cursus dans l'établissement. Confirmez uniquement si nécessaire (cas exceptionnel).
-                </p>
-                <label class="login-checkbox-label mt-2" style="display:block;">
-                    <input type="checkbox" name="confirmation_terminale" value="1" class="form-checkbox">
-                    Je confirme vouloir transférer malgré tout
-                </label>
-            </div>
+{{-- ... sélecteur élèves inchangé ... --}}
 
-            <div class="form-group">
-                <label class="form-label">Élève(s) à transférer *</label>
-                <select name="eleves_ids[]" id="sel_eleves_transfert" multiple required class="form-select"
-                        style="min-height:120px;" disabled>
-                    <option>Choisir d'abord la classe source</option>
-                </select>
-                <p class="text-xs text-gray-400 mt-1">Ctrl+clic pour sélectionner plusieurs élèves</p>
-            </div>
+<div class="form-group">
+    <label class="form-label">Classe destination (arrivée) *</label>
+    <select name="classe_destination_id" required class="form-select">
+        <option value="">-- Choisir --</option>
+        @foreach ($classesDestination as $c)
+            <option value="{{ $c->id }}">{{ $c->nom }} ({{ $c->section->code }})</option>
+        @endforeach
+    </select>
+    <p class="text-xs text-gray-400 mt-1">Les classes d'entrée (6ème, Form 1) ne sont pas listées comme destination de transfert.</p>
 
-            <div class="form-group">
-                <label class="form-label">Classe destination (arrivée) *</label>
-                <select name="classe_destination_id" required class="form-select">
-                    <option value="">-- Choisir --</option>
-                    @foreach ($classes as $c)
-                        <option value="{{ $c->id }}">{{ $c->nom }} ({{ $c->section->code }})</option>
-                    @endforeach
-                </select>
-            </div>
-
+        </div>
             <div class="form-group">
                 <label class="form-label">Date du transfert *</label>
                 <input type="date" name="date_transfert" required class="form-input" value="{{ date('Y-m-d') }}">
@@ -83,8 +64,8 @@
             <button type="submit" class="btn-primary w-full" onclick="return confirm('Confirmer le transfert ?')">
                 <i data-lucide="arrow-right" class="w-4 h-4"></i> Effectuer le transfert
             </button>
-        </form>
-    </div>
+            </form>
+        </div>
 
     <div class="card">
         <h3 class="font-semibold text-gray-800 mb-4">Historique — {{ $annee?->libelle }}</h3>

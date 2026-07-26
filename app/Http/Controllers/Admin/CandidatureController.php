@@ -102,4 +102,32 @@ class CandidatureController extends Controller
         $candidature->update(['statut' => 'en_cours_examen']);
         return back()->with('success', 'Statut mis à jour : en cours d\'examen.');
     }
+
+    public function updateStatut(Request $request, Candidature $candidature)
+{
+    $validated = $request->validate([
+        'statut' => 'required|in:en_attente,acceptee,rejetee',
+        'observation' => 'nullable|string|max:500',
+    ]);
+
+    $candidature->update($validated);
+
+    $libelles = [
+        'en_attente' => 'En attente d\'étude',
+        'acceptee'   => 'Acceptée',
+        'rejetee'    => 'Non retenue',
+    ];
+
+    if ($candidature->email) {
+        try {
+            Mail::to($candidature->email)->send(
+                new CandidatureStatutMail($candidature, $libelles[$validated['statut']])
+            );
+        } catch (\Exception $e) {
+            \Log::error('Échec envoi email candidature: ' . $e->getMessage());
+        }
+    }
+
+    return back()->with('success', 'Statut mis à jour' . ($candidature->email ? ' et email envoyé au parent.' : '.'));
+}
 }

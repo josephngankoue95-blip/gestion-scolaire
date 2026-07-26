@@ -79,7 +79,7 @@
 {{-- CTA --}}
 <section class="sec-cta-section">
     <p>Pour toute inscription au secondaire, contactez l'administration de l'établissement.</p>
-    <a href="{{ route('public.admissions') }}" class="sec-cta-btn">
+    <a href="{{ route('public.candidature.create') }}" class="sec-cta-btn">
         Voir les conditions d'admission <i data-lucide="arrow-right" class="w-4 h-4"></i>
     </a>
 </section>

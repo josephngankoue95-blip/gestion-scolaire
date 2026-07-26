@@ -59,16 +59,12 @@ public function accueil()
         ));
     }
 
-    /** Page Admissions — dossier requis, tarifs, durée */
-    // public function admissions()
-    // {
-    //     $etablissement = Etablissement::instance();
-    //     return view('public.admissions', compact('etablissement'));
-    // }
 
     public function contact()
     {
         $etablissement = Etablissement::instance();
         return view('public.contact', compact('etablissement'));
     }
+
+
 }

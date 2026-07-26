@@ -10,8 +10,9 @@
 <div class="app-layout">
     <aside id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">EL</div>
-            <span class="sidebar-brand">Espace Élève</span>
+            <img src="{{ asset('storage/' . $etablissement->logo) }}" 
+                style="height:50px;border-radius:200px;display:block;margin:0 auto;" 
+                alt="Logo">
         </div>
         <nav class="sidebar-nav">
             <a href="{{ route('eleve.dashboard') }}" class="sidebar-link {{ request()->routeIs('eleve.dashboard') ? 'sidebar-link-active' : '' }}">
@@ -23,9 +24,9 @@
             <a href="{{ route('eleve.emploi-du-temps') }}" class="sidebar-link {{ request()->routeIs('eleve.emploi-du-temps') ? 'sidebar-link-active' : '' }}">
                 <i data-lucide="calendar-clock" class="w-5 h-5"></i> Emploi du temps
             </a>
-            <a href="{{ route('eleve.travaux') }}" class="sidebar-link {{ request()->routeIs('eleve.travaux*') ? 'sidebar-link-active' : '' }}">
-                <i data-lucide="book-marked" class="w-5 h-5"></i> Travaux Dirigés
-            </a>
+            <!-- <a href="{{ route('eleve.epreuves') }}" class="sidebar-link {{ request()->routeIs('eleve.epreuves') ? 'sidebar-link-active' : '' }}">
+                <i data-lucide="file-search" class="w-5 h-5"></i> Épreuves d'examens
+            </a> -->
             <a href="{{ route('eleve.requetes') }}" class="sidebar-link {{ request()->routeIs('eleve.requetes*') ? 'sidebar-link-active' : '' }}">
                 <i data-lucide="mail" class="w-5 h-5"></i> Requêtes
             </a>

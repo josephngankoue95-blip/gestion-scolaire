@@ -327,8 +327,8 @@
 
             <nav class="public-nav">
                 <a href="{{ route('public.home') }}" class="{{ request()->routeIs('public.home') ? 'active' : '' }}">Accueil</a>
-                <a href="{{ route('public.secondaire') }}" class="{{ request()->routeIs('public.secondaire') ? 'active' : '' }}">Le Secondaire</a>
-                <a href="{{ route('public.universite') }}" class="{{ request()->routeIs('public.universite') ? 'active' : '' }}">L'Université</a>
+                <a href="{{ route('public.secondaire') }}" class="{{ request()->routeIs('public.secondaire') ? 'active' : '' }}">Secondaire</a>
+                <a href="{{ route('public.universite') }}" class="{{ request()->routeIs('public.universite') ? 'active' : '' }}">Université</a>
                 <a href="{{ route('public.contact') }}" class="{{ request()->routeIs('public.contact') ? 'active' : '' }}">Contact</a>
                 <a href="{{ route('public.candidature.create') }}" class="public-nav-cta">Étudier un dossier</a>
             </nav>

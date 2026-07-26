@@ -42,32 +42,37 @@
         <div id="bloc_parent_lien" style="{{ old('role') === 'parent' ? '' : 'display:none;' }}">
             <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;">
                 <h4 class="font-semibold text-gray-700 mb-3">
-                    <i data-lucide="users" class="w-4 h-4 inline"></i>
-                    Élève(s) à associer à ce parent
+                    <i data-lucide="users" class="w-4 h-4 inline"></i> Enfant(s) à associer à ce parent
                 </h4>
+                <p class="text-xs text-gray-500 mb-3">
+                    Ce parent peut avoir des enfants dans des classes différentes. Ajoutez une ligne par classe.
+                </p>
 
-                <div class="form-group">
-                    <label class="form-label">Classe</label>
-                    <select id="sel_classe_parent" class="form-select">
-                        <option value="">-- Choisir une classe --</option>
-                        @foreach ($classes as $classe)
-                            <option value="{{ $classe->id }}">
-                                {{ $classe->nom }} ({{ $classe->section->code }})
-                            </option>
-                        @endforeach
-                    </select>
+                <div id="lignes-classes-eleves">
+                    {{-- Ligne initiale --}}
+                    <div class="ligne-classe-eleve" style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
+                        <div style="flex:1;">
+                            <select class="form-select sel-classe-parent">
+                                <option value="">-- Choisir une classe --</option>
+                                @foreach ($classes as $classe)
+                                    <option value="{{ $classe->id }}">{{ $classe->nom }} ({{ $classe->section->code }})</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div style="flex:2;">
+                            <select name="eleves_ids[]" class="form-select sel-eleves-parent" multiple style="min-height:80px;" disabled>
+                                <option>Choisir d'abord une classe</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn-retirer-ligne" style="padding:8px;color:#c0392b;" title="Retirer cette ligne">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Élève(s) associé(s) *</label>
-                    <select name="eleves_ids[]" id="sel_eleves_parent" multiple class="form-select"
-                            style="min-height:120px;" disabled>
-                        <option value="">Choisir d'abord une classe</option>
-                    </select>
-                    <p class="text-xs text-gray-400 mt-1">
-                        Ctrl+clic pour sélectionner plusieurs élèves (frères/sœurs).
-                    </p>
-                </div>
+                <button type="button" id="ajouter-ligne-classe" class="btn-outline" style="font-size:12px;padding:6px 12px;">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Ajouter une autre classe
+                </button>
             </div>
         </div>
 
@@ -104,70 +109,73 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const urlEleves = @json(route('admin.users.elevesByClasse'));
-    const roleSelect = document.getElementById('sel_role');
-    const blocParent = document.getElementById('bloc_parent_lien');
-    const selClasse = document.getElementById('sel_classe_parent');
-    const selEleves = document.getElementById('sel_eleves_parent');
+const urlEleves = "{{ route('admin.users.elevesByClasse') }}";
+const container = document.getElementById('lignes-classes-eleves');
 
-    function toggleBloc() {
-        const isParent = roleSelect.value === 'parent';
-        blocParent.style.display = isParent ? 'block' : 'none';
+function chargerElevesPourLigne(ligne) {
+    const selClasse  = ligne.querySelector('.sel-classe-parent');
+    const selEleves  = ligne.querySelector('.sel-eleves-parent');
+    const classeId   = selClasse.value;
 
-        if (!isParent) {
-            selClasse.value = '';
-            selEleves.innerHTML = '<option value="">Choisir d\'abord une classe</option>';
-            selEleves.disabled = true;
-        }
+    selEleves.innerHTML = '';
+    selEleves.disabled  = true;
+
+    if (!classeId) {
+        selEleves.innerHTML = '<option>Choisir d\'abord une classe</option>';
+        return;
     }
 
-    function loadEleves(classeId) {
-        selEleves.disabled = true;
-        selEleves.innerHTML = '<option value="">Chargement...</option>';
+    selEleves.innerHTML = '<option>Chargement...</option>';
 
-        if (!classeId) {
-            selEleves.innerHTML = '<option value="">Choisir d\'abord une classe</option>';
+    fetch(`${urlEleves}?classe_id=${classeId}`, {
+        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(eleves => {
+        selEleves.innerHTML = '';
+        if (eleves.length === 0) {
+            selEleves.innerHTML = '<option>Aucun élève dans cette classe</option>';
             return;
         }
-
-        fetch(`${urlEleves}?classe_id=${classeId}`, {
-            headers: {
-                'Accept': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            }
-        })
-        .then(response => response.json())
-        .then(eleves => {
-            selEleves.innerHTML = '';
-
-            if (!eleves.length) {
-                selEleves.innerHTML = '<option value="">Aucun élève trouvé</option>';
-                selEleves.disabled = true;
-                return;
-            }
-
-            eleves.forEach(e => {
-                const opt = document.createElement('option');
-                opt.value = e.id;
-                opt.textContent = `${e.prenom} ${e.nom} (${e.matricule ?? ''})`;
-                selEleves.appendChild(opt);
-            });
-
-            selEleves.disabled = false;
-        })
-        .catch(() => {
-            selEleves.innerHTML = '<option value="">Erreur de chargement</option>';
-            selEleves.disabled = true;
+        eleves.forEach(e => {
+            const opt = document.createElement('option');
+            opt.value = e.id;
+            opt.textContent = `${e.prenom} ${e.nom} (${e.matricule})`;
+            selEleves.appendChild(opt);
         });
-    }
+        selEleves.disabled = false;
+    })
+    .catch(() => { selEleves.innerHTML = '<option>Erreur de chargement</option>'; });
+}
 
-    roleSelect.addEventListener('change', toggleBloc);
-    selClasse.addEventListener('change', function () {
-        loadEleves(this.value);
+function attacherEvenements(ligne) {
+    ligne.querySelector('.sel-classe-parent').addEventListener('change', function () {
+        chargerElevesPourLigne(ligne);
     });
+    const btnRetirer = ligne.querySelector('.btn-retirer-ligne');
+    btnRetirer.addEventListener('click', function () {
+        if (container.querySelectorAll('.ligne-classe-eleve').length > 1) {
+            ligne.remove();
+        }
+    });
+}
 
-    toggleBloc();
+// Ligne initiale
+attacherEvenements(container.querySelector('.ligne-classe-eleve'));
+
+// Ajout dynamique de nouvelles lignes
+document.getElementById('ajouter-ligne-classe').addEventListener('click', function () {
+    const template = container.querySelector('.ligne-classe-eleve').cloneNode(true);
+    template.querySelector('.sel-classe-parent').value = '';
+    const selEleves = template.querySelector('.sel-eleves-parent');
+    selEleves.innerHTML = '<option>Choisir d\'abord une classe</option>';
+    selEleves.disabled = true;
+    container.appendChild(template);
+    attacherEvenements(template);
+});
+
+document.getElementById('sel_role').addEventListener('change', function () {
+    document.getElementById('bloc_parent_lien').style.display = this.value === 'parent' ? 'block' : 'none';
 });
 </script>
 @endpush

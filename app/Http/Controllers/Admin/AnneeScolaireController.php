@@ -6,10 +6,10 @@ use App\Models\AnneeScolaire;
 use App\Models\ClasseModel;
 use App\Models\FraisScolarite;
 use App\Models\ZoneTransport;
-use App\Models\Trimestre;
-use App\Models\Sequence;
 use App\Models\Eleve;
-use App\Models\Scolarite;
+use App\Models\Enseignant;
+use App\Models\Affectation;
+use App\Models\Niveau;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -21,10 +21,7 @@ class AnneeScolaireController extends Controller
         return view('admin.annees-scolaires.index', compact('annees'));
     }
 
-    public function create()
-    {
-        return view('admin.annees-scolaires.create');
-    }
+    public function create() { return view('admin.annees-scolaires.create'); }
 
     public function store(Request $request)
     {
@@ -34,77 +31,100 @@ class AnneeScolaireController extends Controller
             'date_fin'   => 'required|date|after:date_debut',
         ]);
 
-        AnneeScolaire::create($validated); // initialisee = false par défaut
+        AnneeScolaire::create($validated);
 
         return redirect()->route('admin.annees-scolaires.index')
-            ->with('success', 'Année créée. Activez-la pour initialiser ses données.');
+            ->with('success', 'Année créée. Activez-la pour l\'initialiser.');
     }
 
     /**
-     * Active une année scolaire.
+     * ── LOGIQUE UNIQUE ──
      *
-     * RÈGLE UNIQUE ET SIMPLE :
-     * - Si $anneeScolaire->initialisee == false → c'est la toute première fois qu'on
-     *   l'active → on copie les classes/matières/frais/zones/trimestres depuis
-     *   L'ANNÉE LA PLUS RÉCENTE QUI EST DÉJÀ INITIALISÉE (peu importe si elle est
-     *   "active" au moment du clic — on ne dépend plus du flag active, qui est
-     *   trop fragile). Puis on marque initialisee = true, définitivement.
+     * SI $anneeScolaire->initialisee == false :
+     *   → Toute première activation. On copie les DONNÉES STRUCTURELLES
+     *     (élèves, classes, matières, groupes, enseignants, affectations,
+     *     niveaux, comptes users, transport, frais, config établissement)
+     *     depuis la dernière année déjà initialisée.
+     *   → Les DONNÉES OPÉRATIONNELLES (scolarité, bulletins, notes, paiements,
+     *     candidatures, tableau d'honneur, cartes, conseils, relevés,
+     *     absences, emploi du temps, PV) NE SONT JAMAIS COPIÉES — l'année
+     *     démarre "vierge" sur ces aspects.
+     *   → On marque initialisee = true, définitivement.
      *
-     * - Si $anneeScolaire->initialisee == true → on ne copie RIEN, on ne touche
-     *   à AUCUNE donnée. On se contente de resynchroniser l'affichage
-     *   (eleve.classe_id) à partir des Scolarite déjà enregistrées pour cette
-     *   année précise. C'est un simple "retour en arrière" en lecture fidèle.
+     * SI $anneeScolaire->initialisee == true :
+     *   → Retour en arrière ou en avant sur une année déjà vécue.
+     *   → AUCUNE copie, AUCUNE suppression. On lit/modifie fidèlement
+     *     ce qui existe déjà pour cette année précise.
      */
     public function activer(AnneeScolaire $anneeScolaire)
     {
         DB::transaction(function () use ($anneeScolaire) {
 
-            // 1. Basculer le flag "active" (affichage global uniquement)
+            $ancienneActive = AnneeScolaire::where('active', true)->where('id','!=',$anneeScolaire->id)->first();
+
             AnneeScolaire::where('active', true)->update(['active' => false]);
             $anneeScolaire->update(['active' => true]);
 
-            // 2. Si déjà initialisée → RIEN À COPIER, on sort après la resync finale
             if ($anneeScolaire->initialisee) {
+                // ── Retour sur une année déjà vécue : lecture pure ──
                 $this->resynchroniserClasses($anneeScolaire);
                 return;
             }
 
-            // 3. Première activation : chercher la meilleure année source à copier
-            //    → la plus récente déjà initialisée (indépendant du flag "active")
+            // ── Première activation : recherche de l'année source ──
             $anneeSource = AnneeScolaire::where('initialisee', true)
                 ->where('id', '!=', $anneeScolaire->id)
                 ->orderByDesc('date_debut')
                 ->first();
 
             if ($anneeSource) {
-                $mapClasses = $this->copierDonneesAnnee($anneeSource, $anneeScolaire);
-                $this->glisserElevesSansScolarite($anneeSource, $anneeScolaire, $mapClasses);
-            } else {
-                // Aucune année source : on crée quand même les trimestres/séquences
-                // pour que l'année soit utilisable, même vide (tout premier lancement du système)
-                $this->creerTrimestresEtSequences($anneeScolaire);
+                $this->marquerDiplomes($anneeSource, $anneeScolaire);
+                $mapClasses = $this->copierStructure($anneeSource, $anneeScolaire);
+                $this->glisserElevesActifs($anneeSource, $anneeScolaire, $mapClasses);
             }
 
-            // 4. Marquer cette année comme définitivement initialisée
             $anneeScolaire->update(['initialisee' => true]);
-
-            // 5. Synchroniser l'affichage
             $this->resynchroniserClasses($anneeScolaire);
         });
 
         $msg = $anneeScolaire->fresh()->initialisee
-            ? "Année {$anneeScolaire->libelle} active. Ses données sont fidèlement restaurées."
-            : "Année {$anneeScolaire->libelle} activée pour la première fois.";
+            ? "Année {$anneeScolaire->libelle} active."
+            : "Année {$anneeScolaire->libelle} initialisée avec succès.";
 
         return back()->with('success', $msg);
     }
 
-    /** Copie classes + matières + frais + zones + trimestres depuis $source vers $cible */
-    protected function copierDonneesAnnee(AnneeScolaire $source, AnneeScolaire $cible): array
+    /**
+     * Marque diplômés les élèves qui étaient en classe TERMINALE l'année
+     * source, et qui n'ont pas déjà de suite prévue. Ils ne sont PAS
+     * supprimés — juste retirés du flux actif (statut = diplome).
+     */
+    protected function marquerDiplomes(AnneeScolaire $source, AnneeScolaire $cible): void
+    {
+        $elevesTerminaux = Eleve::whereHas('scolarites', function ($q) use ($source) {
+                $q->where('annee_scolaire_id', $source->id)
+                  ->whereHas('classe.niveau', fn($q2) => $q2->where('est_terminale', true));
+            })
+            ->where('statut', 'actif')
+            ->get();
+
+        foreach ($elevesTerminaux as $eleve) {
+            $eleve->update(['statut' => 'diplome', 'classe_id' => null]);
+        }
+    }
+
+    /**
+     * Copie UNIQUEMENT les données structurelles :
+     * Classes, Matières (classe_matiere + groupes), Niveaux (déjà globaux,
+     * pas liés à l'année), Enseignants (déjà globaux), Affectations,
+     * Zones de transport, Grilles de frais.
+     * Config établissement est globale (une seule ligne) — jamais dupliquée.
+     */
+    protected function copierStructure(AnneeScolaire $source, AnneeScolaire $cible): array
     {
         $mapClasses = [];
 
-        // Classes + matières
+        // ── Classes + matières (classe_matiere) ──
         $anciennesClasses = ClasseModel::where('annee_scolaire_id', $source->id)->get();
         foreach ($anciennesClasses as $ancienneClasse) {
             $nouvelleClasse = ClasseModel::create([
@@ -113,7 +133,7 @@ class AnneeScolaireController extends Controller
                 'section_id'              => $ancienneClasse->section_id,
                 'annee_scolaire_id'       => $cible->id,
                 'capacite_max'            => $ancienneClasse->capacite_max,
-                'professeur_principal_id' => null,
+                'professeur_principal_id' => null, // à réaffecter par l'admin
             ]);
 
             $matieres = DB::table('classe_matiere')->where('classe_id', $ancienneClasse->id)->get();
@@ -127,7 +147,19 @@ class AnneeScolaireController extends Controller
             $mapClasses[$ancienneClasse->id] = $nouvelleClasse->id;
         }
 
-        // Frais de scolarité
+        // ── Affectations enseignants (classe → matière → enseignant) ──
+        $anciennesAffectations = Affectation::where('annee_scolaire_id', $source->id)->get();
+        foreach ($anciennesAffectations as $aff) {
+            if (!isset($mapClasses[$aff->classe_id])) continue;
+            Affectation::firstOrCreate([
+                'enseignant_id'     => $aff->enseignant_id,
+                'matiere_id'        => $aff->matiere_id,
+                'classe_id'         => $mapClasses[$aff->classe_id],
+                'annee_scolaire_id' => $cible->id,
+            ]);
+        }
+
+        // ── Grilles de frais ──
         $anciensFrais = FraisScolarite::where('annee_scolaire_id', $source->id)->get();
         foreach ($anciensFrais as $f) {
             FraisScolarite::firstOrCreate(
@@ -136,7 +168,7 @@ class AnneeScolaireController extends Controller
             );
         }
 
-        // Zones de transport
+        // ── Zones de transport ──
         $anciennesZones = ZoneTransport::where('annee_scolaire_id', $source->id)->get();
         foreach ($anciennesZones as $z) {
             ZoneTransport::firstOrCreate(
@@ -145,50 +177,49 @@ class AnneeScolaireController extends Controller
             );
         }
 
-        $this->creerTrimestresEtSequences($cible);
+        // Niveaux, Enseignants, Comptes utilisateurs, Config établissement :
+        // déjà GLOBAUX (non liés à annee_scolaire_id) — rien à copier, ils existent déjà.
 
-        return $mapClasses;
-    }
-
-    protected function creerTrimestresEtSequences(AnneeScolaire $annee): void
-    {
+        // ── Trimestres/séquences de la nouvelle année (structure vide, à saisir) ──
         for ($t = 1; $t <= 3; $t++) {
-            $trimestre = Trimestre::firstOrCreate(
-                ['annee_scolaire_id' => $annee->id, 'numero' => $t],
+            $trimestre = \App\Models\Trimestre::firstOrCreate(
+                ['annee_scolaire_id' => $cible->id, 'numero' => $t],
                 ['nom' => "Trimestre {$t}"]
             );
             for ($s = 1; $s <= 2; $s++) {
                 $numSeq = ($t - 1) * 2 + $s;
-                Sequence::firstOrCreate(
+                \App\Models\Sequence::firstOrCreate(
                     ['trimestre_id' => $trimestre->id, 'numero' => $numSeq],
                     ['nom' => "Séquence {$numSeq}"]
                 );
             }
         }
+
+        return $mapClasses;
     }
 
     /**
-     * Crée une Scolarite (placeholder, frais à 0) pour chaque élève de $source
-     * qui n'a pas encore de Scolarite pour $cible, en le plaçant dans sa classe
-     * équivalente. Cela rend le glissement PERSISTANT (contrairement à un simple
-     * cache) : l'élève reste retrouvable même après plusieurs va-et-vient.
+     * Fait "glisser" chaque élève ACTIF (non diplômé) vers sa classe
+     * équivalente de la nouvelle année, en créant une Scolarite PLACEHOLDER
+     * (frais à 0, à compléter). C'est ce qui rend le glissement persistant :
+     * l'élève reste visible même après plusieurs va-et-vient entre années.
      */
-    protected function glisserElevesSansScolarite(AnneeScolaire $source, AnneeScolaire $cible, array $mapClasses): void
+    protected function glisserElevesActifs(AnneeScolaire $source, AnneeScolaire $cible, array $mapClasses): void
     {
         if (empty($mapClasses)) return;
 
-        $elevesSource = Scolarite::where('annee_scolaire_id', $source->id)->get(['eleve_id', 'classe_id']);
+        $scolaritesSource = \App\Models\Scolarite::where('annee_scolaire_id', $source->id)
+            ->whereHas('eleve', fn($q) => $q->where('statut', 'actif'))
+            ->get(['eleve_id', 'classe_id']);
 
-        foreach ($elevesSource as $sc) {
+        foreach ($scolaritesSource as $sc) {
             if (!isset($mapClasses[$sc->classe_id])) continue;
 
-            $existeDeja = Scolarite::where('eleve_id', $sc->eleve_id)
-                ->where('annee_scolaire_id', $cible->id)
-                ->exists();
-
+            $existeDeja = \App\Models\Scolarite::where('eleve_id', $sc->eleve_id)
+                ->where('annee_scolaire_id', $cible->id)->exists();
             if ($existeDeja) continue;
 
-            Scolarite::create([
+            \App\Models\Scolarite::create([
                 'eleve_id'          => $sc->eleve_id,
                 'classe_id'         => $mapClasses[$sc->classe_id],
                 'annee_scolaire_id' => $cible->id,
@@ -204,9 +235,10 @@ class AnneeScolaireController extends Controller
     }
 
     /**
-     * Seule et unique source de vérité pour l'affichage :
-     * eleve.classe_id = classe de la Scolarite enregistrée pour CETTE année.
-     * Aucune donnée n'est créée ni supprimée ici — juste un miroir fidèle.
+     * Seule source de vérité pour l'affichage : eleve.classe_id = classe
+     * de la Scolarite enregistrée pour CETTE année précise. Fonctionne
+     * identiquement pour un retour en arrière ou un retour en avant —
+     * jamais de copie ici, juste un miroir fidèle de ce qui existe.
      */
     protected function resynchroniserClasses(AnneeScolaire $annee): void
     {
@@ -215,9 +247,11 @@ class AnneeScolaireController extends Controller
                 $join->on('scolarites.eleve_id', '=', 'eleves.id')
                      ->where('scolarites.annee_scolaire_id', $annee->id);
             })
+            ->where('eleves.statut', '!=', 'diplome')
             ->update(['eleves.classe_id' => DB::raw('scolarites.classe_id')]);
 
         DB::table('eleves')
+            ->where('statut', '!=', 'diplome')
             ->whereNotIn('id', function ($q) use ($annee) {
                 $q->select('eleve_id')->from('scolarites')->where('annee_scolaire_id', $annee->id);
             })
@@ -228,6 +262,9 @@ class AnneeScolaireController extends Controller
     {
         if ($anneeScolaire->active) {
             return back()->with('error', 'Impossible de supprimer l\'année active.');
+        }
+        if ($anneeScolaire->initialisee) {
+            return back()->with('error', 'Impossible de supprimer une année déjà initialisée (contient des données réelles).');
         }
         $anneeScolaire->delete();
         return back()->with('success', 'Année supprimée.');

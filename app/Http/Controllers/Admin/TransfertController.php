@@ -17,21 +17,28 @@ use Illuminate\Support\Facades\DB;
 class TransfertController extends Controller
 {
     public function index(Request $request)
-    {
-        $annee = AnneeScolaire::getActive();
+{
+    $annee = AnneeScolaire::getActive();
 
-        $classes = ClasseModel::where('annee_scolaire_id', $annee?->id)
-            ->with('section')
-            ->orderBy('nom')
-            ->get();
+    // Classes source : TOUTES sauf les niveaux terminaux
+    $classesSource = ClasseModel::where('annee_scolaire_id', $annee?->id)
+        ->whereHas('niveau', fn($q) => $q->where('est_terminale', false))
+        ->with('section', 'niveau')
+        ->orderBy('nom')
+        ->get();
 
-        $transferts = Transfert::with('eleve', 'classeSource', 'classeDestination', 'effectuePar')
-            ->where('annee_scolaire_id', $annee?->id)
-            ->latest()
-            ->paginate(20);
+    // Classes destination : TOUTES sauf les niveaux d'entrée (6ème / Form 1)
+    $classesDestination = ClasseModel::where('annee_scolaire_id', $annee?->id)
+        ->whereHas('niveau', fn($q) => $q->whereNotIn('code', ['6EME', 'F1']))
+        ->with('section', 'niveau')
+        ->orderBy('nom')
+        ->get();
 
-        return view('admin.transferts.index', compact('classes', 'transferts', 'annee'));
-    }
+    $transferts = Transfert::with('eleve','classeSource','classeDestination','effectuePar')
+        ->where('annee_scolaire_id', $annee?->id)->latest()->paginate(20);
+
+    return view('admin.transferts.index', compact('classesSource', 'classesDestination', 'transferts', 'annee'));
+}
 
     public function elevesClasse(Request $request)
     {

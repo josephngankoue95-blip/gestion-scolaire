@@ -32,29 +32,33 @@ class EmpruntController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'livre_id' => 'required|exists:livres,id',
-            'type_emprunteur' => 'required|in:eleve,enseignant',
-            'eleve_id' => 'nullable|exists:eleves,id',
-            'enseignant_id' => 'nullable|exists:enseignants,id',
-            'date_emprunt' => 'required|date',
-            'date_retour_prevue' => 'required|date|after:date_emprunt',
-        ]);
+{
+    $validated = $request->validate([
+        'livre_id' => 'required|exists:livres,id',
+        'type_emprunteur' => 'required|in:eleve,enseignant',
+        'eleve_id' => 'nullable|required_if:type_emprunteur,eleve|exists:eleves,id',
+        'enseignant_id' => 'nullable|required_if:type_emprunteur,enseignant|exists:enseignants,id',
+        'date_emprunt' => 'required|date',
+        'date_retour_prevue' => 'required|date|after:date_emprunt',
+    ]);
 
-        $livre = Livre::findOrFail($validated['livre_id']);
-        if ($livre->quantite_disponible <= 0) {
-            return back()->with('error','Aucun exemplaire disponible.');
-        }
-
-        Emprunt::create([
-            ...$validated,
-            'enregistre_par' => Auth::id(),
-        ]);
-        $livre->decrement('quantite_disponible');
-
-        return redirect()->route('bibliotheque.emprunts.index')->with('success','Emprunt enregistré.');
+    $livre = Livre::findOrFail($validated['livre_id']);
+    if ($livre->quantite_disponible <= 0) {
+        return back()->with('error','Aucun exemplaire disponible.');
     }
+
+    Emprunt::create([
+        'livre_id' => $validated['livre_id'],
+        'eleve_id' => $validated['eleve_id'] ?? null,
+        'enseignant_id' => $validated['enseignant_id'] ?? null,
+        'date_emprunt' => $validated['date_emprunt'],
+        'date_retour_prevue' => $validated['date_retour_prevue'],
+        'enregistre_par' => Auth::id(),
+    ]);
+    $livre->decrement('quantite_disponible');
+
+    return redirect()->route('bibliotheque.emprunts.index')->with('success','Emprunt enregistré.');
+}
 
     public function retourner(Emprunt $emprunt)
     {
