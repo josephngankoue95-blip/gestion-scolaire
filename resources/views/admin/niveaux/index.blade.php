@@ -93,11 +93,14 @@
                         @endif
                     </div>
                     <form method="POST" action="{{ route('admin.niveaux.destroy', $niveau) }}"
-                          onsubmit="return confirm('Supprimer ce niveau ?')">
-                        @csrf @method('DELETE')
-                        <button class="text-red-500" title="Supprimer">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
+                            data-confirm-delete
+                            data-confirm-message="Supprimer {{ $niveau->nom }} ? Cette action est irréversible.">
+                            @csrf @method('DELETE')
+                            <button type="button" class="text-red-500" onclick="this.closest('form').requestSubmit()">
+                                <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </span>
+                            </button>
                     </form>
                 </div>
 

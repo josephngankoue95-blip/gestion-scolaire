@@ -10,12 +10,7 @@
     <div class="topbar">
         <div class="title">Fiche élève</div>
 
-        <a href="{{ route('admin.eleves.index', [
-                'classe_id' => request('classe_id')
-            ]) }}"
-        class="btn-back">
-            ← Retour
-        </a>
+         <x-retour-button fallback-route="admin.eleves.index" label="Retour"/>
         <a href="{{ route('admin.eleves.edit', [
         $eleve,
         'classe_id' => request('classe_id')

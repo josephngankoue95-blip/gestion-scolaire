@@ -121,17 +121,16 @@
                                 </form>
                             @endif
 
-                            <form action="{{ route('surveillant.absences.destroy', $absence) }}"
-                                  method="POST"
-                                  class="inline"
-                                  onsubmit="return confirm('Supprimer cette absence ?')">
-                                @csrf
-                                @method('DELETE')
-
-                                <button class="text-red-600 hover:underline">
-                                    Supprimer
-                                </button>
-                            </form>
+                        <form method="POST" action="{{ route('surveillant.absences.destroy', $absence) }}"
+                            data-confirm-delete
+                            data-confirm-message="Supprimer {{ $absence->eleve->nomComplet() }} ? Cette action est irréversible.">
+                            @csrf @method('DELETE')
+                            <button type="button" class="text-red-500" onclick="this.closest('form').requestSubmit()">
+                                <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </span>
+                            </button>
+                        </form>
 
                         </td>
 

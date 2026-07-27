@@ -185,6 +185,10 @@ public function create()
 
         $message .= " Rendez-vous dans le module Scolarité pour procéder à son inscription.";
 
+        $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+    }
         return redirect()
             ->route('admin.eleves.index')
             ->with('success', $message);
@@ -320,6 +324,11 @@ public function update(Request $request, Eleve $eleve)
 
     $msg = "Élève modifié avec succès.";
     if (!empty($messages)) $msg .= " — " . implode(' | ', $messages);
+
+    $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+    }
 
     return redirect()->route('admin.eleves.show', $eleve)->with('success', $msg);
 }

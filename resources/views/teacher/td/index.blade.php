@@ -49,9 +49,15 @@
                     <td class="text-right">
                         <a href="{{ route('teacher.td.show', $td) }}" class="login-link mr-2">Voir</a>
                         <a href="{{ route('teacher.td.edit', $td) }}" class="login-link mr-2">Modifier</a>
-                        <form method="POST" action="{{ route('teacher.td.destroy', $td) }}" class="inline" onsubmit="return confirm('Supprimer ?')">
+                        <form method="POST" action="{{ route('teacher.td.destroy', $td) }}"
+                            data-confirm-delete
+                            data-confirm-message="Supprimer {{ $td->titre }} ? Cette action est irréversible.">
                             @csrf @method('DELETE')
-                            <button class="text-red-500 text-sm">Supprimer</button>
+                            <button type="button" class="text-red-500" onclick="this.closest('form').requestSubmit()">
+                                <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </span>
+                            </button>
                         </form>
                     </td>
                 </tr>

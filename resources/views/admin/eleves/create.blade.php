@@ -181,10 +181,9 @@ document.getElementById('toggle_parent').addEventListener('change', function () 
             <div class="grid-card">
                 <div class="card"
                      style="grid-column:1/-1; display:flex; justify-content:flex-end; gap:10px;">
-                    <a href="{{ route('admin.eleves.index') }}" class="btn-back">
-                        Annuler
-                    </a>
-
+                    <x-retour-button fallback-route="admin.eleves.index" label="Annuler" />
+                    {{-- Dans chaque formulaire create/edit --}}
+                    <input type="hidden" name="redirect_to" value="{{ url()->previous() }}">
                     <button type="submit" class="btn-save">
                         Enregistrer
                     </button>
