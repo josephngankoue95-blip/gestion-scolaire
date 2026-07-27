@@ -40,10 +40,15 @@
 
                 @if (!$annee->initialisee)
                 <form method="POST" action="{{ route('admin.annees-scolaires.destroy', $annee) }}"
-                      onsubmit="return confirm('Supprimer cette année ?')">
-                    @csrf @method('DELETE')
-                    <button class="text-red-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
-                </form>
+                            data-confirm-delete
+                            data-confirm-message="Supprimer {{ $annee->libelle }} ? Cette action est irréversible.">
+                            @csrf @method('DELETE')
+                            <button type="button" class="text-red-500" onclick="this.closest('form').requestSubmit()">
+                                <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </span>
+                            </button>
+                        </form>
                 @endif
             @endif
         </div>

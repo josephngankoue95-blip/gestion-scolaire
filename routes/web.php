@@ -143,7 +143,7 @@ Route::middleware(['auth','role:secretaire_intendant'])->prefix('secretaire')->n
 
 
 //Tableaux d'honneur
-Route::middleware(['auth', 'role:admin|proviseur|prefecture_etudes'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin|proviseur|prefet_etudes'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('tableaux-honneur', [TableauHonneurController::class, 'index'])->name('tableaux-honneur.index');
     Route::get('tableaux-honneur/show', [TableauHonneurController::class, 'show'])->name('tableaux-honneur.show');
     Route::get('tableaux-honneur/imprimer', [TableauHonneurController::class, 'imprimer'])->name('tableaux-honneur.imprimer');
@@ -154,14 +154,14 @@ Route::middleware(['auth', 'role:admin|proviseur|prefecture_etudes'])->prefix('a
 });
 
 //Releve de note 
-Route::middleware(['auth','role:admin|secretaire_intendant|prefecture_etudes'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth','role:admin|secretaire_intendant|prefet_etudes'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('releves', [ReleveNoteController::class, 'index'])->name('releves.index');
     Route::get('releves/classe', [ReleveNoteController::class, 'parClasse'])->name('releves.classe');
     Route::get('releves/enseignant', [ReleveNoteController::class, 'parEnseignant'])->name('releves.enseignant');
 });
 
 //Carte Scolaire
-Route::middleware(['auth','role:admin|secretaire_intendant|prefecture_etudes'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth','role:admin|secretaire_intendant|prefet_etudes'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('cartes-scolaires', [CartesScolairesController::class, 'index'])->name('cartes-scolaires.index');
     Route::get('cartes-scolaires/imprimer', [CartesScolairesController::class, 'imprimer'])->name('cartes-scolaires.imprimer');
 });
@@ -295,9 +295,7 @@ Route::middleware(['auth', 'role:eleve'])->prefix('eleve')->name('eleve.')->grou
     Route::get('bulletins', [EleveSpaceController::class, 'bulletins'])->name('bulletins');
     Route::get('bulletins/voir', [EleveSpaceController::class, 'voirBulletin'])->name('bulletins.voir');
     Route::get('emploi-du-temps', [EleveSpaceController::class, 'emploiDuTemps'])->name('emploi-du-temps');
-
     Route::get('epreuves', [EleveSpaceController::class, 'epreuves'])->name('epreuves'); // ← remplace travaux
-
     Route::get('requetes', [EleveSpaceController::class, 'requetes'])->name('requetes');
     Route::post('requetes', [EleveSpaceController::class, 'storeRequete'])->name('requetes.store');
     Route::get('profil', [EleveSpaceController::class, 'profil'])->name('profil');
@@ -440,7 +438,7 @@ Route::middleware(['auth', 'role:admin|proviseur|prefet_etudes'])->prefix('admin
 /**Prefet etudes controleur */
 use App\Http\Controllers\Prefet\PrefetController;
 
-Route::middleware(['auth', 'role:prefet_etudes'])->prefix('prefet')->name('prefet.')->group(function () {
+Route::middleware(['auth', 'role:prefet_etudes'])->name('prefet.')->group(function () {
     Route::get('dashboard', [PrefetController::class, 'dashboard'])->name('dashboard');
 
     Route::get('saisie', [PrefetController::class, 'saisieIndex'])->name('saisie.index');
@@ -448,27 +446,28 @@ Route::middleware(['auth', 'role:prefet_etudes'])->prefix('prefet')->name('prefe
     Route::post('saisie', [PrefetController::class, 'saisieStore'])->name('saisie.store');
     Route::get('ajax/matieres', [PrefetController::class, 'ajaxMatieres'])->name('ajax.matieres');
     Route::get('saisie/controle', [PrefetController::class, 'controlerSaisie'])->name('saisie.controle');
-
     Route::get('travaux', [PrefetController::class, 'travauxDiriges'])->name('travaux.index');
     Route::get('travaux/{travailDirige}', [PrefetController::class, 'voirTravail'])->name('travaux.show');
     Route::get('travaux/{travailDirige}/imprimer', [PrefetController::class, 'imprimerTravail'])->name('travaux.imprimer');
     Route::get('epreuves', [PrefetController::class, 'epreuves'])->name('epreuves.index');
     Route::get('epreuves/{epreuve}', [PrefetController::class, 'voirEpreuve'])->name('epreuves.show');
     Route::get('epreuves/{epreuve}/imprimer', [PrefetController::class, 'imprimerEpreuve'])->name('epreuves.imprimer');
+    Route::get('prefet/epreuves/create', [PrefetController::class, 'epreuveCreate'])->name('prefet.epreuves.create');
+    Route::post('epreuves', [PrefetController::class, 'epreuveStore'])->name('epreuves.store');
 });
 
-// Accès partagés avec l'admin (bulletins, tableau d'honneur, cartes scolaires, procès-verbaux)
-Route::middleware(['auth', 'role:admin|proviseur|prefet_etudes'])->prefix('admin')->name('admin.')->group(function () {
-    // Ces routes existent déjà (bulletins.*, tableaux-honneur.*, cartes-scolaires.*, proces-verbaux.*, conseils.*)
-    // Il suffit d'ajouter 'prefet_etudes' au middleware role: existant sur ces groupes de routes.
-});
+// // Accès partagés avec l'admin (bulletins, tableau d'honneur, cartes scolaires, procès-verbaux)
+// Route::middleware(['auth', 'role:admin|proviseur|prefet_etudes'])->prefix('admin')->name('admin.')->group(function () {
+//     // Ces routes existent déjà (bulletins.*, tableaux-honneur.*, cartes-scolaires.*, proces-verbaux.*, conseils.*)
+//     // Il suffit d'ajouter 'prefet_etudes' au middleware role: existant sur ces groupes de routes.
+// });
 
 /*
 |--------------------------------------------------------------------------
 | ADMIN : Candidatures en ligne
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'role:admin|proviseur|secretaire_intendant|prefecture_etudes'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin|proviseur|secretaire_intendant|prefet_etudes'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('candidatures', [AdminCandidatureController::class, 'index'])->name('candidatures.index');
     Route::get('candidatures/{candidature}', [AdminCandidatureController::class, 'show'])->name('candidatures.show');
     Route::post('candidatures/{candidature}/accepter', [AdminCandidatureController::class, 'accepter'])->name('candidatures.accepter');

@@ -253,17 +253,30 @@ class EleveSpaceController extends Controller
         return back()->with('success', 'Mot de passe mis à jour.');
     }
 
-public function epreuves()
+// EleveSpaceController.php — remplace epreuves()
+
+public function epreuves(Request $request)
 {
     $eleve     = $this->monProfil();
     $scolarite = $eleve->scolariteActive();
-    $niveau    = $scolarite?->classe?->niveau?->nom;
+    $niveauId  = $scolarite?->classe?->niveau_id;
 
-    $epreuves = \App\Models\EpreuveExterne::where('actif', true)
-        ->when($niveau, fn($q) => $q->where(fn($q2) => $q2->where('niveau', $niveau)->orWhereNull('niveau')))
-        ->orderBy('ordre')
+    $anneesDisponibles = \App\Models\EpreuveComposition::where('archive', true)
+        ->where('niveau_id', $niveauId)
+        ->distinct()
+        ->orderByDesc('annee_examen')
+        ->pluck('annee_examen');
+
+    $anneeSelectionnee = $request->filled('annee') ? $request->annee : $anneesDisponibles->first();
+
+    $epreuves = \App\Models\EpreuveComposition::where('archive', true)
+        ->where('niveau_id', $niveauId)
+        ->when($anneeSelectionnee, fn($q) => $q->where('annee_examen', $anneeSelectionnee))
+        ->with('matiere')
+        ->orderBy('matiere_id')
         ->get();
 
-    return view('eleve.epreuves', compact('eleve', 'epreuves'));
+    return view('eleve.epreuves', compact('eleve', 'epreuves', 'anneesDisponibles', 'anneeSelectionnee'));
 }
+
 }

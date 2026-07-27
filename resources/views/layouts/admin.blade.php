@@ -63,7 +63,7 @@
     @endrole
 
     {{-- ================= VIE SCOLAIRE ================= --}}
-    @role('admin|prefecture_etudes')
+    @role('admin|prefet_etudes')
     <p class="sidebar-section-title">Vie scolaire</p>
 
     <a href="{{ route('admin.bulletins.index') }}" class="sidebar-link {{ request()->routeIs('admin.bulletins.*') ? 'sidebar-link-active' : '' }}">
@@ -90,7 +90,7 @@
     @endrole
 
     {{-- Sidebar admin — ajout du lien Conseils de classe --}}
-    @role('admin|prefecture_etudes')
+    @role('admin|prefet_etudes')
     <a href="{{ route('admin.conseils.index') }}" class="sidebar-link {{ request()->routeIs('admin.conseils.*') ? 'sidebar-link-active' : '' }}">
         <i data-lucide="gavel" class="w-5 h-5"></i> Conseils de classe
     </a>
@@ -116,16 +116,6 @@
         <i data-lucide="file-text" class="w-5 h-5"></i> Travaux dirigés
     </a>
     @endrole
-
-    <!-- @role('admin')
-    <p class="sidebar-section-title">Epreuves en Ligne</p>
-
-    <a href="{{ route('admin.epreuves-externes.index') }}"
-    class="sidebar-link {{ request()->routeIs('admin.epreuves-externes.*') ? 'sidebar-link-active' : '' }}">
-        <i data-lucide="calendar-x" class="w-5 h-5"></i>
-        Epreuves en ligne
-    </a>
-    @endrole -->
 
     {{--====================SURVEILLANT================ --}}
 @role('admin|surveillant_general')

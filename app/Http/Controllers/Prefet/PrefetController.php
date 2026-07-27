@@ -231,4 +231,44 @@ public function epreuves(Request $request)
     return view('prefet.epreuves.index', compact('epreuves', 'classes', 'sequences'));
 }
 
+// PrefetController.php — ajout
+
+public function epreuveCreate()
+{
+    $classes = ClasseModel::where('annee_scolaire_id', AnneeScolaire::getActive()?->id)->with('section','niveau')->orderBy('nom')->get();
+    $niveaux = Niveau::orderBy('ordre')->get();
+    $matieres = Matiere::orderBy('nom')->get();
+    $sequences = Sequence::whereHas('trimestre', fn($q) => $q->where('annee_scolaire_id', AnneeScolaire::getActive()?->id))->with('trimestre')->orderBy('numero')->get();
+
+    return view('prefet.epreuves.create', compact('classes', 'niveaux', 'matieres', 'sequences'));
+}
+
+public function epreuveStore(Request $request)
+{
+    $validated = $request->validate([
+        'matiere_id'      => 'required|exists:matieres,id',
+        'classe_id'       => 'nullable|exists:classes,id',
+        'niveau_id'       => 'required|exists:niveaux,id',
+        'sequence_id'     => 'nullable|exists:sequences,id',
+        'annee_examen'    => 'required|digits:4|integer|min:2000|max:' . (date('Y') + 1),
+        'titre'           => 'required|string|max:200',
+        'fichier'         => 'required|file|mimes:pdf,doc,docx|max:10240',
+        'fichier_corrige' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
+        'archive'         => 'nullable|boolean',
+    ]);
+
+    $validated['fichier'] = $request->file('fichier')->store('epreuves', 'public');
+    if ($request->hasFile('fichier_corrige')) {
+        $validated['fichier_corrige'] = $request->file('fichier_corrige')->store('epreuves', 'public');
+    }
+
+    $validated['enseignant_id']     = null; // pas d'enseignant : insérée par le préfet
+    $validated['annee_scolaire_id'] = AnneeScolaire::getActive()?->id;
+    $validated['archive']           = $request->boolean('archive', true);
+
+    EpreuveComposition::create($validated);
+
+    return redirect()->route('prefet.epreuves.index')->with('success', 'Épreuve enregistrée.');
+}
+
 }

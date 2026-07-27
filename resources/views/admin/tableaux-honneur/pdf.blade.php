@@ -19,21 +19,20 @@ body { font-family:'DejaVu Sans', Arial, sans-serif; color:#111; }
 
 .header-table { width:100%; border-collapse:collapse; margin-top:4mm; }
 .header-left { width:66%; }
-.header-right { width:34%; text-align:right; }
+.header-right { width:34%; text-align:right; vertical-align:top; }
 
 .rep-line { font-size:11px; font-weight:bold; color:#123d75; }
 .devise-line { font-size:9px; color:#555; }
 .school { font-size:26px; font-weight:800; color:#123d75; margin-top:1mm; }
 .souligne { font-size:10px; color:#555; margin-top:1mm; }
 
-.flag-img {
-    width:32mm; height:20mm;
-    display:flex;
-    border:1px solid #999;
+/* Remplace .flag-img (flex) par table */
+.flag-img-table {
+    width:32mm; border-collapse:collapse; border:1px solid #999; margin-left:auto;
 }
-.flag-part { flex:1; }
+.flag-img-table td { width:10.66mm; height:20mm; padding:0; }
 .flag-green { background:#007a5e; }
-.flag-red { background:#ce1126; display:flex; align-items:center; justify-content:center; }
+.flag-red { background:#ce1126; text-align:center; vertical-align:middle; }
 .flag-star { color:#fcd116; font-size:16px; }
 .flag-yellow { background:#fcd116; }
 
@@ -72,7 +71,6 @@ body { font-family:'DejaVu Sans', Arial, sans-serif; color:#111; }
 
 .sign-table { width:100%; margin-top:14mm; }
 .sign-cell { text-align:center; font-size:9px; }
-.sign-name { margin-top:8mm; font-weight:bold; font-size:10px; }
 .sign-line { border-top:1px solid #333; margin-top:2mm; padding-top:1mm; font-size:8.5px; color:#555; }
 
 .date-fait { text-align:right; font-size:10px; color:#333; margin-top:6mm; }
@@ -104,11 +102,13 @@ body { font-family:'DejaVu Sans', Arial, sans-serif; color:#111; }
                 <div class="souligne">{{ $etablissement->devise ?? 'Discipline - Travail - Réussite' }}</div>
             </td>
             <td class="header-right">
-                <div class="flag-img" style="margin-left:auto;">
-                    <div class="flag-part flag-green"></div>
-                    <div class="flag-part flag-red"><span class="flag-star">★</span></div>
-                    <div class="flag-part flag-yellow"></div>
-                </div>
+                <table class="flag-img-table">
+                    <tr>
+                        <td class="flag-green"></td>
+                        <td class="flag-red"><span class="flag-star">★</span></td>
+                        <td class="flag-yellow"></td>
+                    </tr>
+                </table>
             </td>
         </tr>
     </table>

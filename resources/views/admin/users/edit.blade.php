@@ -56,40 +56,35 @@
                 </div>
 
                 {{-- Bloc parent : visible uniquement si rôle = parent --}}
-                <div id="bloc_parent_lien" style="{{ old('role') === 'parent' ? '' : 'display:none;' }}">
+                <div id="bloc_parent_lien" style="{{ old('role', $user->roles->first()?->name) === 'parent' ? '' : 'display:none;' }}">
                     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:14px;">
                         <h4 class="font-semibold text-gray-700 mb-3">
-                            <i data-lucide="users" class="w-4 h-4 inline"></i> Enfant(s) à associer à ce parent
+                            <i data-lucide="users" class="w-4 h-4 inline"></i>
+                            Élève(s) à associer à ce parent
                         </h4>
-                        <p class="text-xs text-gray-500 mb-3">
-                            Ce parent peut avoir des enfants dans des classes différentes. Ajoutez une ligne par classe.
-                        </p>
 
-                        <div id="lignes-classes-eleves">
-                            {{-- Ligne initiale --}}
-                            <div class="ligne-classe-eleve" style="display:flex;gap:10px;margin-bottom:10px;align-items:flex-start;">
-                                <div style="flex:1;">
-                                    <select class="form-select sel-classe-parent">
-                                        <option value="">-- Choisir une classe --</option>
-                                        @foreach ($classes as $classe)
-                                            <option value="{{ $classe->id }}">{{ $classe->nom }} ({{ $classe->section->code }})</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div style="flex:2;">
-                                    <select name="eleves_ids[]" class="form-select sel-eleves-parent" multiple style="min-height:80px;" disabled>
-                                        <option>Choisir d'abord une classe</option>
-                                    </select>
-                                </div>
-                                <button type="button" class="btn-retirer-ligne" style="padding:8px;color:#c0392b;" title="Retirer cette ligne">
-                                    <i data-lucide="x" class="w-4 h-4"></i>
-                                </button>
-                            </div>
+                        <div class="form-group">
+                            <label class="form-label">Classe</label>
+                            <select id="sel_classe_parent" class="form-select">
+                                <option value="">-- Choisir une classe --</option>
+                                @foreach ($classes as $classe)
+                                    <option value="{{ $classe->id }}">
+                                        {{ $classe->nom }} ({{ $classe->section->code }})
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
 
-                        <button type="button" id="ajouter-ligne-classe" class="btn-outline" style="font-size:12px;padding:6px 12px;">
-                            <i data-lucide="plus" class="w-4 h-4"></i> Ajouter une autre classe
-                        </button>
+                        <div class="form-group">
+                            <label class="form-label">Élève(s) associé(s) *</label>
+                            <select name="eleves_ids[]" id="sel_eleves_parent" multiple class="form-select"
+                                    style="min-height:120px;" disabled>
+                                <option value="">Choisir d'abord une classe</option>
+                            </select>
+                            <p class="text-xs text-gray-400 mt-1">
+                                Ctrl+clic pour sélectionner plusieurs élèves (frères/sœurs).
+                            </p>
+                        </div>
                     </div>
                 </div>
 

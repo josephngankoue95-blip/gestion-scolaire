@@ -24,9 +24,9 @@
             <a href="{{ route('eleve.emploi-du-temps') }}" class="sidebar-link {{ request()->routeIs('eleve.emploi-du-temps') ? 'sidebar-link-active' : '' }}">
                 <i data-lucide="calendar-clock" class="w-5 h-5"></i> Emploi du temps
             </a>
-            <!-- <a href="{{ route('eleve.epreuves') }}" class="sidebar-link {{ request()->routeIs('eleve.epreuves') ? 'sidebar-link-active' : '' }}">
+            <a href="{{ route('eleve.epreuves') }}" class="sidebar-link {{ request()->routeIs('eleve.epreuves') ? 'sidebar-link-active' : '' }}">
                 <i data-lucide="file-search" class="w-5 h-5"></i> Épreuves d'examens
-            </a> -->
+            </a>
             <a href="{{ route('eleve.requetes') }}" class="sidebar-link {{ request()->routeIs('eleve.requetes*') ? 'sidebar-link-active' : '' }}">
                 <i data-lucide="mail" class="w-5 h-5"></i> Requêtes
             </a>

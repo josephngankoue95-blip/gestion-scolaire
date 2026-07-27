@@ -2,7 +2,10 @@
 @section('title', 'Épreuves de composition')
 @section('content')
 <div class="card">
-    <h3 class="font-semibold text-gray-800 mb-4">Épreuves de composition envoyées par les enseignants</h3>
+    <div class="flex justify-between items-center mb-4">
+        <h3 class="font-semibold text-gray-800">Épreuves de composition</h3>
+
+    </div>
 
     <form method="GET" class="flex gap-3 mb-4">
         <select name="classe_id" class="form-select" onchange="this.form.submit()">
@@ -23,9 +26,9 @@
                 <tr>
                     <td class="font-medium">{{ $e->titre }}</td>
                     <td>{{ $e->matiere->nom }}</td>
-                    <td>{{ $e->classe->nom }}</td>
-                    <td>{{ $e->sequence->nom }}</td>
-                    <td>{{ $e->enseignant->user->name }}</td>
+                    <td>{{ $e->classe->nom ?? '-' }}</td>
+                    <td>{{ $e->sequence->nom ?? '-' }}</td>
+                    <td>{{ $e->enseignant->user->name ?? 'Préfecture' }}</td>
                     <td class="text-right">
                         <a href="{{ asset('storage/'.$e->fichier) }}" target="_blank" class="login-link mr-2">
                             <i data-lucide="download" class="w-3 h-3 inline"></i> Télécharger
@@ -36,7 +39,7 @@
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="text-center text-gray-400 py-6">Aucune épreuve reçue.</td></tr>
+                <tr><td colspan="6" class="text-center text-gray-400 py-6">Aucune épreuve.</td></tr>
                 @endforelse
             </tbody>
         </table>
