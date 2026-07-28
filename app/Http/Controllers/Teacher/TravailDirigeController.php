@@ -76,6 +76,11 @@ class TravailDirigeController extends Controller
 
         TravailDirige::create($validated);
 
+            $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+    }
+
         return redirect()->route('teacher.td.index')
             ->with('success', 'Travail dirigé créé.');
     }
@@ -128,6 +133,11 @@ class TravailDirigeController extends Controller
 
     // Mettre à jour les champs autorisés
     $travailDirige->update($validated);
+
+        $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+    }
 
     return redirect()->route('teacher.td.index')->with('success', 'TD mis à jour.');
 }

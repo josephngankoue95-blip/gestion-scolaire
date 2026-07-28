@@ -48,9 +48,9 @@
                     <td>{{ $absence->motif ?? '-' }}</td>
                     <td>
                         @if($absence->justifiee)
-                            <span class="badge-green">Justifiée</span>
+                            <span class="badge badge-green">Justifiée</span>
                         @else
-                            <span class="badge-red">Non justifiée</span>
+                            <span class="badge badge-red">Non justifiée</span>
                         @endif
                     </td>
                 </tr>

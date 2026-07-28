@@ -56,6 +56,11 @@ public function index(Enseignant $enseignant)
             'annee_scolaire_id' => AnneeScolaire::getActive()?->id,
         ]);
 
+        $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+    }
+
         return redirect()->route('admin.enseignants.affectations', $enseignant)
             ->with('success', 'Affectation ajoutée avec succès.');
     }

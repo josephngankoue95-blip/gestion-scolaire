@@ -1,1 +1,3 @@
-<a href="{{ $url }}" class="btn-secondary">{{ $label }}</a>
+<a href="{{ $url }}" {{ $attributes->merge(['class' => 'btn-secondary']) }}>
+    {{ $label }}
+</a>

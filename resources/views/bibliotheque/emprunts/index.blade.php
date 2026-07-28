@@ -17,10 +17,10 @@
                     <td>{{ $e->date_emprunt->format('d/m/Y') }}</td>
                     <td style="color:{{ $e->estEnRetard() ? '#c0392b' : '#111' }};">{{ $e->date_retour_prevue->format('d/m/Y') }}</td>
                     <td>
-                        @if($e->statut === 'retourne') <span class="badge-green">Retourné</span>
-                        @elseif($e->estEnRetard()) <span class="badge-red">En retard</span>
-                        @elseif($e->statut === 'perdu') <span class="badge-gray">Perdu</span>
-                        @else <span class="badge-blue">En cours</span>
+                        @if($e->statut === 'retourne') <span class="badge badge-green">Retourné</span>
+                        @elseif($e->estEnRetard()) <span class="badge badge-red">En retard</span>
+                        @elseif($e->statut === 'perdu') <span class="badge badge-gray">Perdu</span>
+                        @else <span class="badge badge-blue">En cours</span>
                         @endif
                     </td>
                     <td class="text-right">

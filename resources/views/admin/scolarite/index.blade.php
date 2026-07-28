@@ -95,10 +95,10 @@
                         @php
                             $solde = $sc->solde();
                             $badge = [
-                                'paye' => 'badge-green',
-                                'partiel' => 'badge-amber',
-                                'non_paye' => 'badge-red',
-                                'na' => 'badge-gray'
+                                'paye' => 'badge badge-green',
+                                'partiel' => 'badge badge-amber',
+                                'non_paye' => 'badge badge-red',
+                                'na' => 'badge badge-gray'
                             ];
                         @endphp
                         <tr>
@@ -124,9 +124,9 @@
                             <td>
                                 @if($sc->montant_transport > 0)
                                     @php $s = $sc->statutTranche('transport'); @endphp
-                                    <span class="{{ $badge[$s] }}">{{ $s === 'paye' ? '✓' : '✗' }}</span>
+                                    <span class= "badge {{ $badge[$s] }}">{{ $s === 'paye' ? '✓' : '✗' }}</span>
                                 @else
-                                    <span class="badge-gray">-</span>
+                                    <span class="badge badge-gray">-</span>
                                 @endif
                             </td>
                             <td>{{ number_format($sc->totalDu(), 0, ',', ' ') }}</td>

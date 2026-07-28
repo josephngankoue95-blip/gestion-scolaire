@@ -43,6 +43,10 @@ class LivreController extends Controller
         ]);
         $validated['quantite_disponible'] = $validated['quantite_totale'];
         Livre::create($validated);
+            $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+    }
         return redirect()->route('bibliotheque.livres.index')->with('success','Livre ajouté.');
     }
 
@@ -63,6 +67,11 @@ class LivreController extends Controller
         $diff = $validated['quantite_totale'] - $livre->quantite_totale;
         $livre->update($validated);
         $livre->increment('quantite_disponible', $diff);
+
+            $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+    }
 
         return redirect()->route('bibliotheque.livres.index')->with('success','Livre modifié.');
     }

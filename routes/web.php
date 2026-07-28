@@ -42,7 +42,6 @@ use App\Http\Controllers\Parent\PaiementMobileController;
 use App\Http\Controllers\Admin\PaiementMobileAdminController;
 use App\Http\Controllers\Public\SitePublicController;
 use App\Http\Controllers\Admin\EvenementController;
-use App\Http\Controllers\Admin\EpreuveExterneController;
 
 //Notes & Bulletins
 use App\Http\Controllers\Teacher\SaisieNoteController;
@@ -127,18 +126,22 @@ Route::middleware(['auth','role:admin|proviseur|secretaire_intendant'])->prefix(
 });
 
 /**SECRETAIRE */
-Route::middleware(['auth','role:secretaire_intendant'])->prefix('secretaire')->name('secretaire.')->group(function () {
+Route::middleware(['auth', 'role:secretaire_intendant'])->prefix('secretaire')->name('secretaire.')->group(function () {
     Route::get('dashboard', [SecretaireController::class, 'dashboard'])->name('dashboard');
     Route::get('scolarite', [SecretaireController::class, 'scolarite'])->name('scolarite');
-    Route::get('scolarite/create', [SecretaireController::class, 'createScolarite'])->name('scolarite.create');
-    Route::post('scolarite', [SecretaireController::class, 'storeScolarite'])->name('scolarite.store');
     Route::get('scolarite/{scolarite}', [SecretaireController::class, 'showScolarite'])->name('scolarite.show');
     Route::post('scolarite/{scolarite}/paiement', [SecretaireController::class, 'paiement'])->name('scolarite.paiement');
+    Route::get('inscription/create', [SecretaireController::class, 'inscriptionCreate'])->name('inscription.create');
+    Route::post('inscription', [SecretaireController::class, 'inscriptionStore'])->name('inscription.store');
     Route::get('requetes', [SecretaireController::class, 'requetes'])->name('requetes');
     Route::post('requetes/{requete}/traiter', [SecretaireController::class, 'traiterRequete'])->name('requetes.traiter');
     Route::get('profil', [SecretaireController::class, 'profil'])->name('profil');
     Route::post('profil', [SecretaireController::class, 'updateProfil'])->name('profil.update');
-    Route::get('scolarite/frais/pour-classe', [SecretaireController::class, 'fraisPourClasse'])->name('scolarite.frais.pour-classe');
+});
+
+// Le reçu de paiement (route partagée avec admin) doit rester accessible à la secrétaire :
+Route::middleware(['auth','role:admin|secretaire_intendant'])->group(function () {
+    Route::get('admin/scolarite/paiements/{paiement}/recu', [\App\Http\Controllers\Admin\PaiementScolariteController::class, 'recu'])->name('admin.scolarite.paiements.recu');
 });
 
 
@@ -300,11 +303,6 @@ Route::middleware(['auth', 'role:eleve'])->prefix('eleve')->name('eleve.')->grou
     Route::post('requetes', [EleveSpaceController::class, 'storeRequete'])->name('requetes.store');
     Route::get('profil', [EleveSpaceController::class, 'profil'])->name('profil');
     Route::post('profil', [EleveSpaceController::class, 'updateProfil'])->name('profil.update');
-});
-
-/**Lien Epreuve */
-Route::middleware(['auth','role:admin|enseignant'])->prefix('admin')->name('admin.')->group(function () {
-    Route::resource('epreuves-externes', \App\Http\Controllers\Admin\EpreuveExterneController::class)->except(['show']);
 });
 
 // Gestion requêtes côté admin/secrétaire

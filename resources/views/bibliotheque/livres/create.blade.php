@@ -12,7 +12,10 @@
         <div class="form-group"><label class="form-label">Catégorie</label><input name="categorie" class="form-input" value="{{ $livre->categorie ?? '' }}"></div>
         <div class="form-group"><label class="form-label">Quantité totale *</label><input type="number" name="quantite_totale" min="1" required class="form-input" value="{{ $livre->quantite_totale ?? 1 }}"></div>
         <div class="form-group"><label class="form-label">Emplacement</label><input name="emplacement" class="form-input" value="{{ $livre->emplacement ?? '' }}"></div>
-        <button type="submit" class="btn-primary w-full">Créer</button>
+        <div class="flex gap-2">
+        <x-retour-button fallback-route="bibliotheque.livres.index" label="Retour" class="btn-back" />
+        <button type="submit" class="btn-primary">Créer</button>
+        </div>
     </form>
 </div>
 @endsection

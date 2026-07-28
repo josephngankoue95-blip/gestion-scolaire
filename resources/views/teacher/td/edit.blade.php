@@ -5,7 +5,6 @@
 <div class="card" style="max-width:720px;">
     <div class="flex justify-between items-center mb-4">
         <h3 class="font-semibold text-gray-800">Modifier — {{ $travailDirige->titre }}</h3>
-        <a href="{{ route('teacher.td.index') }}" class="btn-secondary">← Retour</a>
     </div>
 
     @if ($errors->any())
@@ -93,8 +92,8 @@
         </div>
 
         <div class="flex gap-3">
-            <a href="{{ route('teacher.td.index') }}" class="btn-secondary w-full">Annuler</a>
-            <button type="submit" class="btn-primary w-full">
+            <x-retour-button fallback-route="teacher.td.index" label="Retour" class="btn-back" />
+            <button type="submit" class="btn-primary">
                 <i data-lucide="save" class="w-4 h-4"></i> Enregistrer
             </button>
         </div>

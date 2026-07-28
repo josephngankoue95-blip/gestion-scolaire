@@ -15,8 +15,8 @@ public function up(): void
         $table->id();
         $table->foreignId('enseignant_id')->constrained('enseignants')->onDelete('cascade');
         $table->foreignId('matiere_id')->constrained('matieres')->onDelete('cascade');
-        $table->foreignId('classe_id')->constrained('classes')->onDelete('cascade');
-        $table->foreignId('sequence_id')->constrained('sequences')->onDelete('cascade');
+        $table->foreignId('classe_id')->nullable()->constrained()->nullOnDelete();
+        $table->foreignId('sequence_id')->nullable()->constrained()->nullOnDelete();
         $table->foreignId('annee_scolaire_id')->constrained('annees_scolaires')->onDelete('cascade');
         $table->string('titre');
         $table->string('fichier'); // épreuve uploadée (PDF/Word)

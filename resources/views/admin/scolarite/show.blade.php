@@ -54,9 +54,9 @@
                                             {{ number_format($reste, 0, ',', ' ') }}
                                         </td>
                                         <td>
-                                            @if($s === 'paye') <span class="badge-green">Payé</span>
-                                            @elseif($s === 'partiel') <span class="badge-amber">Partiel</span>
-                                            @else <span class="badge-red">Non payé</span>
+                                            @if($s === 'paye') <span class="badge badge-green">Payé</span>
+                                            @elseif($s === 'partiel') <span class="badge badge-amber">Partiel</span>
+                                            @else <span class="badge badge-red">Non payé</span>
                                             @endif
                                         </td>
                                     </tr>
@@ -88,9 +88,19 @@
                         <div class="flex items-center gap-3">
                             <span class="font-bold" style="color:#1a7a1a;">{{ number_format($p->montant, 0, ',', ' ') }} FCFA</span>
                             <a href="{{ route('admin.scolarite.paiements.recu', $p) }}" target="_blank" class="login-link text-xs">Reçu</a>
-                            <form method="POST" action="{{ route('admin.scolarite.paiements.destroy', $p) }}" onsubmit="return confirm('Annuler ce paiement ?')">
+                            <!-- <form method="POST" action="{{ route('admin.scolarite.paiements.destroy', $p) }}" onsubmit="return confirm('Annuler ce paiement ?')">
                                 @csrf @method('DELETE')
                                 <button class="text-red-500"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                            </form> -->
+                            <form method="POST" action="{{ route('admin.scolarite.paiements.destroy', $p) }}"
+                                data-confirm-delete
+                                data-confirm-message="Supprimer ce paiement ? Cette action est irréversible.">
+                                @csrf @method('DELETE')
+                                <button type="button" class="text-red-500" onclick="this.closest('form').requestSubmit()">
+                                    <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition">
+                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                    </span>
+                                </button>
                             </form>
                         </div>
                     </div>

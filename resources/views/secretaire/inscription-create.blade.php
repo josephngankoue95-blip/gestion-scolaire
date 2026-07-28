@@ -1,4 +1,4 @@
-@extends('layouts.admin')
+@extends('layouts.secretaire')
 @section('title', 'Inscrire un élève')
 
 @section('content')
@@ -6,11 +6,11 @@
 
     <div class="topbar flex items-center justify-between gap-3 flex-wrap">
         <div class="title">Inscrire un élève — {{ $annee?->libelle }}</div>
-        <a href="{{ route('admin.scolarite.index') }}" class="btn-back">← Retour</a>
+        <a href="{{ route('secretaire.scolarite') }}" class="btn-back">← Retour</a>
     </div>
 
     <div class="card mx-auto" style="max-width:720px;">
-        <form method="POST" action="{{ route('admin.scolarite.store') }}" class="space-y-4" id="form-inscription">
+        <form method="POST" action="{{ route('secretaire.inscription.store') }}" class="space-y-4" id="form-inscription">
             @csrf
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -19,7 +19,7 @@
                     <select name="eleve_id" id="sel_eleve" required class="form-select">
                         <option value="">-- Choisir --</option>
                         @foreach ($eleves as $eleve)
-                            <option value="{{ $eleve->id }}" data-classe-id="{{ $eleve->classe_id ?? '' }}" data-classe-nom="{{ $eleve->classe?->nom ?? '' }}">
+                            <option value="{{ $eleve->id }}" data-classe-id="{{ $eleve->classe_id ?? '' }}">
                                 {{ $eleve->nomComplet() }} ({{ $eleve->matricule }})
                             </option>
                         @endforeach
@@ -29,21 +29,22 @@
 
                 <div class="form-group text-center">
                     <label class="form-label block text-center">Classe *</label>
-                    {{-- select visuel TOUJOURS désactivé, ne sert que d'affichage --}}
                     <select
-                        id="sel_classe_display"
+                        name="classe_id"
+                        id="sel_classe"
+                        required
                         class="form-select bg-gray-100 text-gray-500 cursor-not-allowed opacity-80"
                         disabled
                     >
-                        <option value="">-- Sélectionnez d'abord un élève --</option>
+                        <option value="">-- Choisir --</option>
+                        @foreach ($classes as $classe)
+                            <option value="{{ $classe->id }}">{{ $classe->nom }} ({{ $classe->section->code }})</option>
+                        @endforeach
                     </select>
-                    {{-- champ réellement soumis, caché --}}
-                    <input type="hidden" name="classe_id" id="classe_hidden" required>
                     @error('classe_id') <p class="form-error">{{ $message }}</p> @enderror
-                    <p id="msg_pas_de_classe" class="text-xs text-red-500 mt-1 hidden">
-                        Cet élève n'a pas encore de classe. Affectez-le d'abord dans le module Classes/Élèves.
-                    </p>
                 </div>
+
+                <input type="hidden" name="classe_id" id="classe_hidden">
 
                 <div class="form-group text-center">
                     <label class="form-label block text-center">Date d'inscription *</label>
@@ -117,8 +118,8 @@
             </div>
 
             <div class="flex gap-2 pt-1">
-                <x-retour-button fallback-route="admin.scolarite.index" label="Annuler" />
-                <button type="submit" class="btn-save w-full" id="btn-submit" disabled>Enregistrer l'inscription</button>
+                <a href="{{ route('secretaire.scolarite') }}" class="btn-back w-full text-center">Annuler</a>
+                <button type="submit" class="btn-save w-full">Enregistrer l'inscription</button>
             </div>
         </form>
     </div>
@@ -127,21 +128,32 @@
 @push('scripts')
 <script>
 const urlFrais = "{{ route('admin.scolarite.frais.pour-classe') }}";
-const selEleve         = document.getElementById('sel_eleve');
-const selClasseDisplay = document.getElementById('sel_classe_display');
-const classeHidden     = document.getElementById('classe_hidden');
-const msgPasDeClasse   = document.getElementById('msg_pas_de_classe');
-const btnSubmit        = document.getElementById('btn-submit');
+const selEleve = document.getElementById('sel_eleve');
+const selClasse = document.getElementById('sel_classe');
+
+function setClasseReadonly(state) {
+    selClasse.disabled = state;
+    selClasse.classList.toggle('bg-gray-100', state);
+    selClasse.classList.toggle('text-gray-600', state);
+    selClasse.classList.toggle('cursor-not-allowed', state);
+}
 
 function chargerFrais(classeId) {
     if (!classeId) return;
+
     fetch(`${urlFrais}?classe_id=${classeId}`, {
-        headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
     })
-    .then(r => r.ok ? r.json() : null)
+    .then(async (r) => {
+        if (!r.ok) return null;
+        return r.json();
+    })
     .then(data => {
         if (!data) return;
-        document.getElementById('fi').value  = data.frais_inscription ?? 0;
+        document.getElementById('fi').value = data.frais_inscription ?? 0;
         document.getElementById('mt1').value = data.tranche1 ?? 0;
         document.getElementById('mt2').value = data.tranche2 ?? 0;
         document.getElementById('mt3').value = data.tranche3 ?? 0;
@@ -152,29 +164,30 @@ function chargerFrais(classeId) {
 }
 
 selEleve.addEventListener('change', function () {
-    const opt       = this.options[this.selectedIndex];
-    const classeId   = opt.dataset.classeId || '';
-    const classeNom  = opt.dataset.classeNom || '';
+    const opt = this.options[this.selectedIndex];
+    const classeId = opt.dataset.classeId || '';
 
     if (classeId) {
-        // Affiche la classe (lecture seule) + remplit le champ réellement soumis
-        selClasseDisplay.innerHTML = `<option value="${classeId}" selected>${classeNom}</option>`;
-        classeHidden.value = classeId;
-        msgPasDeClasse.classList.add('hidden');
+        selClasse.value = classeId;
+        document.getElementById('classe_hidden').value = classeId;
+        setClasseReadonly(true);
         chargerFrais(classeId);
-        btnSubmit.disabled = false;
     } else {
-        selClasseDisplay.innerHTML = '<option value="">-- Sélectionnez d\'abord un élève --</option>';
-        classeHidden.value = '';
-        msgPasDeClasse.classList.remove('hidden');
-        document.getElementById('fi').value  = 0;
+        selClasse.value = '';
+        document.getElementById('classe_hidden').value = '';
+        setClasseReadonly(false);
+        document.getElementById('fi').value = 0;
         document.getElementById('mt1').value = 0;
         document.getElementById('mt2').value = 0;
         document.getElementById('mt3').value = 0;
         document.getElementById('frais-auto-msg').classList.add('hidden');
         calculerTotal();
-        btnSubmit.disabled = true;
     }
+});
+
+selClasse.addEventListener('change', function () {
+    if (selClasse.disabled) return;
+    if (this.value) chargerFrais(this.value);
 });
 
 document.getElementById('sel_zone').addEventListener('change', function () {
@@ -184,11 +197,11 @@ document.getElementById('sel_zone').addEventListener('change', function () {
 });
 
 function calculerTotal() {
-    const fi  = parseFloat(document.getElementById('fi').value)  || 0;
+    const fi = parseFloat(document.getElementById('fi').value) || 0;
     const mt1 = parseFloat(document.getElementById('mt1').value) || 0;
     const mt2 = parseFloat(document.getElementById('mt2').value) || 0;
     const mt3 = parseFloat(document.getElementById('mt3').value) || 0;
-    const mt  = parseFloat(document.getElementById('mt').value)  || 0;
+    const mt = parseFloat(document.getElementById('mt').value) || 0;
     document.getElementById('total_scolarite').textContent = (fi + mt1 + mt2 + mt3 + mt).toLocaleString('fr-FR') + ' FCFA';
 }
 

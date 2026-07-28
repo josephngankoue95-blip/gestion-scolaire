@@ -83,9 +83,7 @@
         <div class="section">
             <div class="grid-card">
                 <div class="card" style="grid-column:1/-1; display:flex; justify-content:flex-end; gap:10px;">
-                    <a href="{{ route('admin.classes.index') }}" class="btn-back">
-                        Annuler
-                    </a>
+<x-retour-button fallback-route="admin.classes.index" label="Annuler" class="btn-back" />
                     <button type="submit" class="btn-save">
                         Créer la classe
                     </button>

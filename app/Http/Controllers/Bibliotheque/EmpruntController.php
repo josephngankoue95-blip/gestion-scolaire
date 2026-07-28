@@ -57,6 +57,11 @@ class EmpruntController extends Controller
     ]);
     $livre->decrement('quantite_disponible');
 
+        $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+    }
+
     return redirect()->route('bibliotheque.emprunts.index')->with('success','Emprunt enregistré.');
 }
 

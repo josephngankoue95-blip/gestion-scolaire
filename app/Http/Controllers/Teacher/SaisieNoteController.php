@@ -199,6 +199,11 @@ class SaisieNoteController extends Controller
             }
         });
 
+            $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+    }
+
         return redirect()->route('teacher.saisie.index')
             ->with('success', 'Notes enregistrées avec succès.');
     }

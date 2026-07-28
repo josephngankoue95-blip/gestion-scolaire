@@ -17,21 +17,14 @@
                     <td>{{ $l->auteur ?? '-' }}</td>
                     <td>{{ $l->categorie ?? '-' }}</td>
                     <td>{{ $l->quantite_totale }}</td>
-                    <td><span class="{{ $l->quantite_disponible > 0 ? 'badge-green' : 'badge-red' }}">{{ $l->quantite_disponible }}</span></td>
+                    <td><span class="{{ $l->quantite_disponible > 0 ? 'badge badge-green' : 'badge-red' }}">{{ $l->quantite_disponible }}</span></td>
                     <td class="text-right">
-                        <a href="{{ route('bibliotheque.livres.edit',$l) }}" class="login-link">Modifier</a>
+                        <a href="{{ route('bibliotheque.livres.edit',$l) }}" class="login-link">
+                            <i data-lucide="edit" class="w-4 h-4"></i>
+                        </a>
                     </td>
                     <td class="text-right">
-                        <form method="POST" action="{{ route('bibliotheque.livres.destroy', $l) }}"
-                            data-confirm-delete
-                            data-confirm-message="Supprimer {{ $l->titre }} ? Cette action est irréversible.">
-                            @csrf @method('DELETE')
-                            <button type="button" class="text-red-500" onclick="this.closest('form').requestSubmit()">
-                                <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </span>
-                            </button>
-                        </form>
+                        
                     </td>
                 </tr>
                 @endforeach

@@ -15,9 +15,7 @@
             </div>
         </div>
 
-        <a href="{{ route('admin.classes.index') }}" class="btn-back">
-            ← Retour
-        </a>
+<x-retour-button fallback-route="admin.classes.index" label="Retour" class="btn-back" />
     </div>
 
     <!-- AJOUT MATIÈRE -->

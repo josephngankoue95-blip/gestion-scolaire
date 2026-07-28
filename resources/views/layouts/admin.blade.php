@@ -12,10 +12,9 @@
     <div class="app-layout">
 
         <aside id="sidebar" class="sidebar">
-            <div class="sidebar-header"> 
-            <img src="{{ asset('storage/' . $etablissement->logo) }}" 
-                style="height:50px;border-radius:200px;display:block;margin:10px auto;" 
-                alt="Logo">
+            <div class="sidebar-header" style="display:flex; justify-content:center; align-items:center; height:80px;">
+                <img src="{{ asset('storage/etablissement/logo.jpeg') }}" alt="Logo"
+                    style="width:60px; height:60px; object-fit:cover;">
             </div>
 
             <nav class="sidebar-nav">
@@ -179,7 +178,7 @@
     @role('enseignant')
     <p class="sidebar-section-title">Mon espace</p>
 
-    <a href="{{ route('teacher.epreuves.index') }}" class="sidebar-link">
+    <a href="{{ route('teacher.epreuves.index') }}" class="sidebar-link {{ request()->routeIs('teacher.epreuves.*') ? 'sidebar-link-active' : '' }}">
        <i data-lucide="file-plus" class="w-5 h-5"></i> Épreuves de composition
     </a>
     <a href="{{ route('teacher.saisie.index') }}" class="sidebar-link {{ request()->routeIs('teacher.saisie.*') ? 'sidebar-link-active' : '' }}">

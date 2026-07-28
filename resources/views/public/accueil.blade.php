@@ -9,11 +9,11 @@
     <div style="position:absolute;bottom:-80px;left:-40px;width:220px;height:220px;background:rgba(47,158,68,0.15);border-radius:50%;animation:float 8s ease-in-out infinite reverse;"></div>
 
     <div class="max-w-7xl mx-auto px-4 lg:px-8" style="padding:90px 24px;text-align:center;position:relative;z-index:2;">
-        <div class="fade-in-up" style="animation-delay:0.1s;">
+        <!-- <div class="fade-in-up" style="animation-delay:0.1s;">
             @if($etablissement->logo)
                 <img src="{{ $etablissement->logoUrl() }}" style="height:90px;border-radius:50%;margin:0 auto 20px;border:3px solid rgba(255,255,255,0.3);display:block;">
             @endif
-        </div>
+        </div> -->
         <h1 class="fade-in-up" style="animation-delay:0.2s;font-size:44px;font-weight:900;margin-bottom:14px;line-height:1.15;">
             Bienvenue à {{ $etablissement->nom ?? "l'établissement" }}
         </h1>

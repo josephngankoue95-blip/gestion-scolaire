@@ -16,12 +16,8 @@
         <div class="flex gap-2">
 
             {{-- RETOUR --}}
-            <a href="{{ route('admin.enseignants.index', [
-                    'search' => request('search')
-                ]) }}"
-               class="btn-back">
-                ← Retour
-            </a>
+            <x-retour-button fallback-route="admin.enseignants.index" 
+            label="Retour" class="btn-back" />
 
             {{-- MODIFIER --}}
             <a href="{{ route('admin.enseignants.edit', $enseignant) }}"

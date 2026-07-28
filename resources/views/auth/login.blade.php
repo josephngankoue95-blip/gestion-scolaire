@@ -5,9 +5,10 @@
 <div class="login-card">
 
     <div class="login-header">
-        <img src="{{ asset('storage/' . $etablissement->logo) }}" 
-                style="height:150px;border-radius:200px;display:block;margin:0 auto;" 
-                alt="Logo">
+            <div class="sidebar-header" style="display:flex; justify-content:center; align-items:center; height:80px;">
+                <img src="{{ asset('storage/etablissement/logo.jpeg') }}" alt="Logo"
+                    style="width:100px; height:100px; object-fit:cover;">
+            </div>
         <h1 class="login-title">Connexion à l'espace de gestion</h1>
         <p class="login-subtitle">Réservé au personnel et aux parents inscrits</p>
     </div>
@@ -70,4 +71,6 @@
         </a>
     </div> -->
 </div>
+
 @endsection
+

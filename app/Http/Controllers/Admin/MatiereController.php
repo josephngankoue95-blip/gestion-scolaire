@@ -71,6 +71,11 @@ public function index(Request $request)
 
         Matiere::create($validated);
 
+        $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+    }
+
         return redirect()->route('admin.matieres.index')
             ->with('success', 'Matière créée avec succès.');
     }
@@ -90,6 +95,11 @@ public function index(Request $request)
         ]);
 
         $matiere->update($validated);
+
+        $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+    }
 
         return redirect()->route('admin.matieres.index')
             ->with('success', 'Matière modifiée avec succès.');

@@ -59,9 +59,7 @@
 
         <!-- ACTIONS -->
         <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:20px;">
-            <a href="{{ route('admin.matieres.index') }}" class="btn-back">
-                Annuler
-            </a>
+<x-retour-button fallback-route="admin.matieres.index" label="Retour" class="btn-back" />
 
             <button type="submit" class="btn-save">
                 Créer

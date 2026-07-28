@@ -96,8 +96,11 @@
 
         </div>
 
+        
         {{-- bouton mieux espacé --}}
         <div class="mt-8 flex justify-end">
+            <x-retour-button fallback-route="admin.enseignants.index" label="Retour" class="btn-back" />
+            <p> &nbsp; &nbsp; &nbsp; </p>
             <button type="submit"
                     class="btn-save px-6 py-2 rounded-lg shadow-sm">
                 + Ajouter affectation
@@ -150,23 +153,22 @@
 
                                     <div class="flex items-center justify-center gap-2">
 
-                                        {{-- SUPPRIMER --}}
                                         <form method="POST"
-                                              action="{{ route('admin.enseignants.affectations.destroy', [$enseignant, $affectation]) }}"
-                                              onsubmit="return confirm('Retirer cette affectation ?')">
+      action="{{ route('admin.enseignants.affectations.destroy', [
+            'enseignant' => $affectation->enseignant,
+            'affectation' => $affectation
+      ]) }}"
+      data-confirm-delete
+      data-confirm-message="Supprimer {{ $affectation->enseignant->user->nom }} ? Cette action est irréversible.">
+    @csrf
+    @method('DELETE')
 
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button type="submit"
-                                                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 text-red-500 hover:bg-red-50 hover:text-red-600 transition shadow-sm"
-                                                    title="Supprimer">
-
-                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
-
-                                            </button>
-
-                                        </form>
+    <button type="button" class="text-red-500" onclick="this.closest('form').requestSubmit()">
+        <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+        </span>
+    </button>
+</form>
 
                                     </div>
 

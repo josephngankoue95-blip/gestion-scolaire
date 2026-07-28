@@ -7,9 +7,18 @@
 <section class="sec-hero">
     <!-- <div class="sec-hero-blob"></div> -->
     <div class="fade-in-up">
-        @if($etablissement->logo)
+        <!-- @if($etablissement->logo)
             <img src="{{ $etablissement->logoUrl() }}" style="height:80px;border-radius:50%;margin:0 auto 18px;border:3px solid rgba(255,255,255,0.3);display:block;">
-        @endif
+        @endif -->
+        <div style="display:flex; justify-content:center; align-items:center; height:80px;">
+            <img src="{{ asset('storage/etablissement/logo.jpeg') }}" alt="Logo"
+            style="width:200px; height:200px; object-fit:cover; border-radius:50%;">
+        </div>
+            <br>
+            <br>
+            <br>
+            <br>
+            <br>
         <span class="sec-badge">ENSEIGNEMENT SECONDAIRE</span>
         <h1>{{ strtoupper($etablissement->nom ?? '') }}</h1>
         <p>Un parcours bilingue complet, du 1er au 2nd cycle, pensé pour la réussite de chaque élève.</p>

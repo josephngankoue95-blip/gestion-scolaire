@@ -69,6 +69,11 @@ class EnseignantController extends Controller
         'eleve_lie'    => null,
     ]);
 
+        $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+    }
+
     return redirect()->route('admin.enseignants.index')
         ->with('success', "Enseignant créé. Identifiant : {$user->email} / Mot de passe : {$motDePasse}");
 }
@@ -107,6 +112,11 @@ class EnseignantController extends Controller
             'diplome' => $validated['diplome'] ?? null,
             'statut' => $validated['statut'],
         ]);
+
+            $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+    }
 
         return redirect()->route('admin.enseignants.index', $enseignant)
             ->with('success', 'Enseignant modifié avec succès.');

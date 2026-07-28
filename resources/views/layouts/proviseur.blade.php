@@ -9,11 +9,15 @@
 <body>
 <div class="app-layout">
     <aside id="sidebar" class="sidebar">
-        <div class="sidebar-header">
-            <img src="{{ asset('storage/' . $etablissement->logo) }}" 
+        <!-- <div class="sidebar-header"> -->
+            <!-- <img src="{{ asset('storage/' . $etablissement->logo) }}" 
                 style="height:50px;border-radius:200px;display:block;margin:0 auto;" 
-                alt="Logo">
+                alt="Logo"> -->
+        <div class="sidebar-header" style="display:flex; justify-content:center; align-items:center; height:80px;">
+            <img src="{{ asset('storage/etablissement/logo.jpeg') }}" alt="Logo"
+            style="width:60px; height:60px; object-fit:cover; border-radius:50%;">
         </div>
+        <!-- </div> -->
         <nav class="sidebar-nav">
             <a href="{{ route('proviseur.dashboard') }}" class="sidebar-link {{ request()->routeIs('proviseur.dashboard') ? 'sidebar-link-active' : '' }}">
                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Tableau de bord

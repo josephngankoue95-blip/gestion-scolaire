@@ -249,7 +249,7 @@ document.getElementById('toggle_eleve')?.addEventListener('change', function () 
                 <div class="card"
                      style="grid-column:1/-1; display:flex; justify-content:flex-end; gap:10px;">
 
- <x-retour-button fallback-route="admin.eleves.index" label="Annuler" class="btn-back" />
+                    <x-retour-button fallback-route="admin.eleves.index" label="Annuler" class="btn-back" />
 
                     <button type="submit"
                             class="btn-save">

@@ -8,13 +8,19 @@
     <!-- <div class="uni-hero-blob"></div> -->
 
     <div class="fade-in-up" style="display:flex;justify-content:center;gap:24px;align-items:center;margin-bottom:20px;flex-wrap:wrap;">
-        @if($etablissement->logo_universite)
-            <img src="{{ asset('storage/'.$etablissement->logo_universite) }}" style="height:78px;background:#fff;border-radius:12px;padding:6px;">
-        @endif
-        @if($etablissement->logo_universite_partenaire)
-            <img src="{{ asset('storage/'.$etablissement->logo_universite_partenaire) }}" style="height:78px;background:#fff;border-radius:12px;padding:6px;">
-        @endif
+            <div style="display:flex; justify-content:center; align-items:center; height:80px;">
+                <img src="{{ asset('storage/etablissement/univ.jpg') }}" alt="Logo"
+                    style="width:160px; height:160px; object-fit:cover; border-radius:50%;">
+            </div>
+            <div style="display:flex; justify-content:center; align-items:center; height:80px;">
+                <img src="{{ asset('storage/etablissement/univp.jpeg') }}" alt="Logo"
+                    style="width:160px; height:160px; object-fit:cover; border-radius:50%;">
+            </div>
     </div>
+    <br>
+    <br>
+    <br>
+    <br>
 
     @if($etablissement->autorisation_minesup)
     <p class="fade-in-up" style="animation-delay:.15s;font-size:10.5px;color:#ffd54a;font-weight:bold;letter-spacing:0.5px;">

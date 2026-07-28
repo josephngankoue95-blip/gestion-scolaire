@@ -83,6 +83,11 @@ public function create()
 
         ClasseModel::create($validated);
 
+                    $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+    }
+
         return redirect()
             ->route('admin.classes.index')
             ->with('success', 'Classe créée avec succès.');
@@ -108,6 +113,11 @@ public function create()
         ]);
 
         $classe->update($validated);
+
+        $redirectTo = $request->input('redirect_to');
+        if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+            return redirect($redirectTo)->with('success', 'Enregistré avec succès.');
+        }
 
         return redirect()
             ->route('admin.classes.index')

@@ -1,37 +1,32 @@
 @extends('layouts.secretaire')
 @section('title', 'Dossier scolarité')
-
 @section('content')
 <div class="grid grid-cols-3 gap-6">
     <div class="col-span-2 flex flex-col gap-4">
-
         <div class="card">
             <div class="flex justify-between items-center mb-4">
                 <div>
                     <h3 class="font-semibold text-gray-800 text-lg">{{ $scolarite->eleve->nomComplet() }}</h3>
                     <p class="text-sm text-gray-500">{{ $scolarite->classe->nom }} — {{ $scolarite->anneeScolaire->libelle }}</p>
                 </div>
-                <span class="{{ $scolarite->solde() <= 0 ? 'badge-green' : 'badge-red' }}">
-                    {{ $scolarite->solde() <= 0 ? 'Soldé' : 'Redevable' }}
-                </span>
+                <span class="{{ $scolarite->solde()<=0?'badge-green':'badge-red' }}">{{ $scolarite->solde()<=0?'Soldé':'Redevable' }}</span>
             </div>
-
             <div class="table-wrapper">
                 <table class="table-base">
                     <thead><tr><th>Rubrique</th><th>Dû</th><th>Payé</th><th>Solde</th><th>Statut</th></tr></thead>
                     <tbody>
                     @php
                         $rubriques = [
-                            ['label' => 'Inscription','du' => $scolarite->frais_inscription,'paye' => $scolarite->paye_inscription,'type' => 'inscription'],
-                            ['label' => 'Tranche 1','du' => $scolarite->montant_tranche1,'paye' => $scolarite->paye_tranche1,'type' => 'tranche1'],
-                            ['label' => 'Tranche 2','du' => $scolarite->montant_tranche2,'paye' => $scolarite->paye_tranche2,'type' => 'tranche2'],
-                            ['label' => 'Tranche 3','du' => $scolarite->montant_tranche3,'paye' => $scolarite->paye_tranche3,'type' => 'tranche3'],
-                            ['label' => 'Transport','du' => $scolarite->montant_transport,'paye' => $scolarite->paye_transport,'type' => 'transport'],
+                            ['label'=>'Inscription','du'=>$scolarite->frais_inscription,'paye'=>$scolarite->paye_inscription,'type'=>'inscription'],
+                            ['label'=>'Tranche 1','du'=>$scolarite->montant_tranche1,'paye'=>$scolarite->paye_tranche1,'type'=>'tranche1'],
+                            ['label'=>'Tranche 2','du'=>$scolarite->montant_tranche2,'paye'=>$scolarite->paye_tranche2,'type'=>'tranche2'],
+                            ['label'=>'Tranche 3','du'=>$scolarite->montant_tranche3,'paye'=>$scolarite->paye_tranche3,'type'=>'tranche3'],
+                            ['label'=>'Transport','du'=>$scolarite->montant_transport,'paye'=>$scolarite->paye_transport,'type'=>'transport'],
                         ];
                     @endphp
                     @foreach ($rubriques as $r)
-                    @if($r['du'] > 0)
-                    @php $reste = $r['du']-$r['paye']; $s = $scolarite->statutTranche($r['type']); @endphp
+                    @if($r['du']>0)
+                    @php $reste=$r['du']-$r['paye']; $s=$scolarite->statutTranche($r['type']); @endphp
                     <tr>
                         <td class="font-medium">{{ $r['label'] }}</td>
                         <td>{{ number_format($r['du'],0,',',' ') }}</td>
@@ -100,22 +95,10 @@
                     @endif
                 </select>
             </div>
-            <div class="form-group">
-                <label class="form-label">Montant (FCFA) *</label>
-                <input type="number" name="montant" required min="1" class="form-input">
-                @error('montant') <p class="form-error">{{ $message }}</p> @enderror
-            </div>
-            <div class="form-group">
-                <label class="form-label">Date *</label>
-                <input type="date" name="date_paiement" required class="form-input" value="{{ date('Y-m-d') }}">
-            </div>
-            <div class="form-group">
-                <label class="form-label">Note</label>
-                <textarea name="note" rows="2" class="form-textarea"></textarea>
-            </div>
-            <button type="submit" class="btn-success w-full">
-                <i data-lucide="check" class="w-4 h-4"></i> Enregistrer
-            </button>
+            <div class="form-group"><label class="form-label">Montant (FCFA) *</label><input type="number" name="montant" required min="1" class="form-input">@error('montant')<p class="form-error">{{ $message }}</p>@enderror</div>
+            <div class="form-group"><label class="form-label">Date *</label><input type="date" name="date_paiement" required class="form-input" value="{{ date('Y-m-d') }}"></div>
+            <div class="form-group"><label class="form-label">Note</label><textarea name="note" rows="2" class="form-textarea"></textarea></div>
+            <button type="submit" class="btn-success w-full"><i data-lucide="check" class="w-4 h-4"></i> Enregistrer</button>
         </form>
     </div>
 </div>

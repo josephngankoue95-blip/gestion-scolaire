@@ -317,12 +317,15 @@
         <div class="public-header-inner">
 
             <a href="{{ route('public.home') }}" class="site-brand">
-                @if ($etablissement->logo)
+                <!-- @if ($etablissement->logo)
                     <img src="{{ asset('storage/' . $etablissement->logo) }}" style="height:42px;border-radius:8px;" alt="Logo">
                 @else
                     <div class="site-brand-logo">{{ substr($etablissement->sigle ?? 'LC', 0, 2) }}</div>
                 @endif
-                {{ $etablissement->nom ?? 'Lycée / Collège' }}
+                {{ $etablissement->nom ?? 'Lycée / Collège' }} -->
+                
+                    <img src="{{ asset('storage/etablissement/logo.jpeg') }}" alt="Logo"
+                        style="width:60px; height:60px; object-fit:cover;">
             </a>
 
             <nav class="public-nav">
@@ -375,9 +378,13 @@
 
     <div class="public-footer-top">
         <div class="footer-brand">
-            @if ($etablissement->logo)
+            <!-- @if ($etablissement->logo)
                 <img src="{{ asset('storage/' . $etablissement->logo) }}" style="height:44px;border-radius:8px;" alt="Logo">
-            @endif
+            @endif -->
+            <div style="display:flex; justify-content:center; align-items:center; height:80px;">
+                <img src="{{ asset('storage/etablissement/logo.jpeg') }}" alt="Logo"
+                style="width:100px; height:100px; object-fit:cover; border-radius:50%;">
+            </div>
             <div>
                 <p class="footer-brand-name">{{ $etablissement->nom ?? 'Établissement' }}</p>
                 @if($etablissement->devise)

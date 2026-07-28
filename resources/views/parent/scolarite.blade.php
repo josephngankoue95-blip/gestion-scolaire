@@ -17,7 +17,7 @@
 <div class="card">
     <h3 class="font-semibold text-gray-800 mb-4">
         Situation scolarité — {{ $enfant->nomComplet() }}
-        @if($scolarite) <span class="badge-blue">{{ $scolarite->classe->nom }}</span> @endif
+        @if($scolarite) <span class="badge badge-blue">{{ $scolarite->classe->nom }}</span> @endif
     </h3>
 
     @if(!$scolarite)
@@ -71,7 +71,7 @@
                     <td>
                         @if($s === 'paye') <span class="badge badge-green">Payé</span>
                         @elseif($s === 'partiel') <span class="badge badge-amber">Partiel</span>
-                        @else <span class="badge-red">Non payé</span>
+                        @else ($s === 'non paye')<span class="badge badge-red">Non payé</span>
                         @endif
                     </td>
                 </tr>

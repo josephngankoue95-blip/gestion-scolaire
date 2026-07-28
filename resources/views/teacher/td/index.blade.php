@@ -20,7 +20,7 @@
                     <th>Publication</th>
                     <th>Délai accès</th>
                     <th>Statut</th>
-                    <th class="text-right">Actions</th>
+                    <!-- <th class="text-center">Actions</th> -->
                 </tr>
             </thead>
             <tbody>
@@ -45,10 +45,15 @@
                             {{ $td->date_limite_acces->format('d/m/Y H:i') }}
                         </span>
                     </td>
-                    <td><span class="{{ $badgeClass }}">{{ ucfirst($statut) }}</span></td>
-                    <td class="text-right">
-                        <a href="{{ route('teacher.td.show', $td) }}" class="login-link mr-2">Voir</a>
-                        <a href="{{ route('teacher.td.edit', $td) }}" class="login-link mr-2">Modifier</a>
+                    <td><span class="badge {{ $badgeClass }}">{{ ucfirst($statut) }}</span></td>
+                    <td class="text-center">
+                        <div class="flex gap-2">
+                            <a href="{{ route('teacher.td.show', $td) }}" class="login-link mr-2">
+                                <i data-lucide="eye" class="w-4 h-4"></i>
+                            </a>
+                            <a href="{{ route('teacher.td.edit', $td) }}" class="login-link mr-2">
+                                <i data-lucide="pencil" class="w-4 h-4"></i>
+                            </a>
                         <form method="POST" action="{{ route('teacher.td.destroy', $td) }}"
                             data-confirm-delete
                             data-confirm-message="Supprimer {{ $td->titre }} ? Cette action est irréversible.">
@@ -59,6 +64,7 @@
                                 </span>
                             </button>
                         </form>
+                        </div>
                     </td>
                 </tr>
                 @empty

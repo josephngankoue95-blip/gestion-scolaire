@@ -21,7 +21,7 @@
         <label class="form-label">Niveau</label>
         <input type="text"
                class="form-input"
-               value="{{ $classe->niveau }}"
+               value="{{ $classe->niveau->nom }}"
                readonly>
     </div>
 
@@ -58,10 +58,7 @@
     </div>
 
     <div class="actions">
-        <a href="{{ route('admin.classes.index', ['section' => request('section')]) }}"
-           class="btn-cancel">
-            Retour à la liste
-        </a>
+<x-retour-button fallback-route="admin.classes.index" label="Retour à la liste" class="btn-back" />
 
         <a href="{{ route('admin.classes.edit', $classe) }}" class="btn-save">
             Modifier la classe

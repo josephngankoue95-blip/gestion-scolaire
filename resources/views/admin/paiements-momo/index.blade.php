@@ -5,7 +5,7 @@
 <div class="card">
     <div class="flex justify-between items-center mb-4">
         <h3 class="font-semibold text-gray-800">Paiements Mobile Money</h3>
-        <span class="badge-amber">{{ $enAttente }} en attente de validation</span>
+        <span class="badge badge-amber">{{ $enAttente }} en attente de validation</span>
     </div>
 
     <form method="GET" class="flex gap-3 mb-4">
@@ -36,7 +36,7 @@
                     <td>{{ ucfirst(str_replace(['tranche','inscription','transport'],['Tranche ','Inscription','Transport'],$p->type_paiement)) }}</td>
                     <td style="font-weight:bold;">{{ number_format($p->montant,0,',',' ') }} FCFA</td>
                     <td><code style="font-size:11px;">{{ $p->reference_transaction }}</code></td>
-                    <td><span class="{{ $p->badgeClass() }}">{{ ucfirst($p->statut) }}</span></td>
+                    <td><span class="badge {{ $p->badgeClass() }}">{{ ucfirst($p->statut) }}</span></td>
                     <td class="text-right">
                         @if($p->statut === 'en_attente')
                         <form method="POST" action="{{ route('admin.paiements-momo.valider', $p) }}" class="inline" onsubmit="return confirm('Valider ce paiement ?')">

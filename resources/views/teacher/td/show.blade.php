@@ -12,11 +12,11 @@
         </div>
         <div class="flex gap-2">
             @php $statut = $travailDirige->statut(); @endphp
-            <span class="{{ match($statut) { 'actif' => 'badge-green', 'brouillon' => 'badge-gray', 'programme' => 'badge-blue', 'expire' => 'badge-red', default => 'badge-gray' } }}">
+            <span class="{{ match($statut) { 'actif' => 'badge badge-green', 'brouillon' => 'badge-gray', 'programme' => 'badge-blue', 'expire' => 'badge-red', default => 'badge-gray' } }}">
                 {{ ucfirst($statut) }}
             </span>
-            <a href="{{ route('teacher.td.edit', $travailDirige) }}" class="btn-outline">Modifier</a>
-            <a href="{{ route('teacher.td.index') }}" class="btn-secondary">← Retour</a>
+            <a href="{{ route('teacher.td.edit', $travailDirige) }}" class="btn-save">Modifier</a>
+             <x-retour-button fallback-route="teacher.td.index" label="retour" />
         </div>
     </div>
 
