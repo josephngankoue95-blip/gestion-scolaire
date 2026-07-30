@@ -15,7 +15,7 @@
                 alt="Logo"> -->
          <div class="sidebar-header" style="display:flex; justify-content:center; align-items:center; height:80px;">
             <img src="{{ asset('storage/etablissement/logo.jpeg') }}" alt="Logo"
-            style="width:200px; height:200px; object-fit:cover; border-radius:50%;">
+            style="width:60px; height:60px; object-fit:cover; border-radius:50%;">
         </div>
         </div>
         <nav class="sidebar-nav">
@@ -28,8 +28,13 @@
             <a href="{{ route('prefet.travaux.index') }}" class="sidebar-link {{ request()->routeIs('prefet.travaux.*') ? 'sidebar-link-active' : '' }}">
                 <i data-lucide="book-marked" class="w-5 h-5"></i> Travaux Dirigés
             </a>
-            <a href="{{ route('prefet.epreuves.index') }}" class="sidebar-link {{ request()->routeIs('prefet.epreuves.*') ? 'sidebar-link-active' : '' }}">
-                <i data-lucide="file-check-2" class="w-5 h-5"></i> Épreuves de composition
+
+            <a href="{{ route('prefet.epreuves-composition.index') }}" class="sidebar-link {{ request()->routeIs('prefet.epreuves-composition.*') ? 'sidebar-link-active' : '' }}">
+                <i data-lucide="eye" class="w-5 h-5"></i> Épreuves de composition
+            </a>
+
+            <a href="{{ route('prefet.epreuves-examen.index') }}" class="sidebar-link {{ request()->routeIs('prefet.epreuves-examen.*') ? 'sidebar-link-active' : '' }}">
+                <i data-lucide="archive" class="w-5 h-5"></i> Épreuves d'examen
             </a>
             <a href="{{ route('prefet.saisie.index') }}" class="sidebar-link {{ request()->routeIs('prefet.saisie.*') ? 'sidebar-link-active' : '' }}">
                 <i data-lucide="pencil-line" class="w-5 h-5"></i> Saisir des notes

@@ -255,22 +255,19 @@ class EleveSpaceController extends Controller
 
 // EleveSpaceController.php — remplace epreuves()
 
+
 public function epreuves(Request $request)
 {
     $eleve     = $this->monProfil();
     $scolarite = $eleve->scolariteActive();
     $niveauId  = $scolarite?->classe?->niveau_id;
 
-    $anneesDisponibles = \App\Models\EpreuveComposition::where('archive', true)
-        ->where('niveau_id', $niveauId)
-        ->distinct()
-        ->orderByDesc('annee_examen')
-        ->pluck('annee_examen');
+    $anneesDisponibles = \App\Models\EpreuveExamen::where('niveau_id', $niveauId)
+        ->distinct()->orderByDesc('annee_examen')->pluck('annee_examen');
 
     $anneeSelectionnee = $request->filled('annee') ? $request->annee : $anneesDisponibles->first();
 
-    $epreuves = \App\Models\EpreuveComposition::where('archive', true)
-        ->where('niveau_id', $niveauId)
+    $epreuves = \App\Models\EpreuveExamen::where('niveau_id', $niveauId)
         ->when($anneeSelectionnee, fn($q) => $q->where('annee_examen', $anneeSelectionnee))
         ->with('matiere')
         ->orderBy('matiere_id')

@@ -31,9 +31,9 @@
                     <td>{{ $td->classe->nom }}</td>
                     <td>{{ $td->enseignant->user->name }}</td>
                     <td>
-                        @if($td->statut() === 'actif') <span class="badge-green">Actif</span>
-                        @elseif($td->statut() === 'expire') <span class="badge-red">Expiré</span>
-                        @else <span class="badge-gray">{{ ucfirst($td->statut()) }}</span>
+                        @if($td->statut() === 'actif') <span class="badge badge-green">Actif</span>
+                        @elseif($td->statut() === 'expire') <span class="badge badge-red">Expiré</span>
+                        @else <span class="badge badge-gray">{{ ucfirst($td->statut()) }}</span>
                         @endif
                     </td>
                     <td class="text-right">

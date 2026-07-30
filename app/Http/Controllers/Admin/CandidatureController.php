@@ -29,15 +29,12 @@ class CandidatureController extends Controller
         return view('admin.candidatures.index', compact('candidatures'));
     }
 
-    public function show(Candidature $candidature)
-    {
-        $candidature->load('documents', 'section');
-        $classes = ClasseModel::where('section_id', $candidature->section_id)
-            ->where('annee_scolaire_id', AnneeScolaire::getActive()?->id)
-            ->get();
-
-        return view('admin.candidatures.show', compact('candidature', 'classes'));
-    }
+public function show(Candidature $candidature)
+{
+    // Aucune relation obligatoire ici normalement, mais on charge quand même
+    // par sécurité si vous avez ajouté une classe visée, un niveau, etc.
+    return view('admin.candidatures.show', compact('candidature'));
+}
 
     /** Accepter la candidature → conversion en élève + inscription */
     public function accepter(Request $request, Candidature $candidature)
@@ -106,7 +103,7 @@ class CandidatureController extends Controller
     public function updateStatut(Request $request, Candidature $candidature)
 {
     $validated = $request->validate([
-        'statut' => 'required|in:en_attente,acceptee,rejetee',
+        'statut'      => 'required|in:en_attente,acceptee,rejetee',
         'observation' => 'nullable|string|max:500',
     ]);
 
@@ -120,14 +117,20 @@ class CandidatureController extends Controller
 
     if ($candidature->email) {
         try {
-            Mail::to($candidature->email)->send(
-                new CandidatureStatutMail($candidature, $libelles[$validated['statut']])
+            \Illuminate\Support\Facades\Mail::to($candidature->email)->send(
+                new \App\Mail\CandidatureStatutMail($candidature, $libelles[$validated['statut']])
             );
         } catch (\Exception $e) {
             \Log::error('Échec envoi email candidature: ' . $e->getMessage());
         }
     }
 
+    $redirectTo = $request->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Statut mis à jour' . ($candidature->email ? ' et email envoyé.' : '.'));
+    }
+
     return back()->with('success', 'Statut mis à jour' . ($candidature->email ? ' et email envoyé au parent.' : '.'));
 }
+
 }

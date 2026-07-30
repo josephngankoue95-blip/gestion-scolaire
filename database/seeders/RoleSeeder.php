@@ -22,6 +22,7 @@ class RoleSeeder extends Seeder
 
         foreach ($roles as $role) {
             Role::firstOrCreate(['name' => $role]);
+            $user->syncRoles(['prefet_etudes', 'enseignant']);
         }
     }
 }

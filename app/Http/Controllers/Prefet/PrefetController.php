@@ -2,7 +2,7 @@
 namespace App\Http\Controllers\Prefet;
 
 use App\Http\Controllers\Controller;
-use App\Models\EpreuveExterne;
+use App\Models\EpreuveExamen;
 use App\Models\EpreuveComposition;
 use App\Models\TravailDirige;
 use App\Models\ClasseModel;
@@ -11,6 +11,7 @@ use App\Models\Sequence;
 use App\Models\Trimestre;
 use App\Models\Note;
 use App\Models\AnneeScolaire;
+use App\Models\Niveau;
 use Illuminate\Http\Request;
 
 class PrefetController extends Controller
@@ -148,6 +149,14 @@ class PrefetController extends Controller
             ->with('success', 'Notes enregistrées avec succès (saisie effectuée par la préfecture des études).');
     }
 
+    // PrefetController.php — ajout
+
+    public function epreuveExamenShow(\App\Models\EpreuveExamen $epreuveExamen)
+    {
+        $epreuveExamen->load('matiere', 'niveau', 'inserePar');
+        return view('prefet.epreuves-examen.show', compact('epreuveExamen'));
+    }
+
 /** Vue détaillée des notes saisies par un enseignant pour vérification (lecture seule) */
 public function controlerSaisie(Request $request)
 {
@@ -211,9 +220,7 @@ public function imprimerTravail(TravailDirige $travailDirige)
     return $pdf->stream("TD_{$travailDirige->titre}.pdf");
 }
 
-// PrefetController — ajout
-
-public function epreuves(Request $request)
+public function epreuvesComposition(Request $request)
 {
     $annee = AnneeScolaire::getActive();
 
@@ -228,47 +235,78 @@ public function epreuves(Request $request)
     $classes   = ClasseModel::where('annee_scolaire_id', $annee?->id)->orderBy('nom')->get();
     $sequences = Sequence::whereHas('trimestre', fn($q) => $q->where('annee_scolaire_id', $annee?->id))->orderBy('numero')->get();
 
-    return view('prefet.epreuves.index', compact('epreuves', 'classes', 'sequences'));
+    return view('prefet.epreuves-composition.index', compact('epreuves', 'classes', 'sequences'));
 }
 
-// PrefetController.php — ajout
-
-public function epreuveCreate()
+public function epreuveCompositionShow(EpreuveComposition $epreuveComposition)
 {
-    $classes = ClasseModel::where('annee_scolaire_id', AnneeScolaire::getActive()?->id)->with('section','niveau')->orderBy('nom')->get();
-    $niveaux = Niveau::orderBy('ordre')->get();
-    $matieres = Matiere::orderBy('nom')->get();
-    $sequences = Sequence::whereHas('trimestre', fn($q) => $q->where('annee_scolaire_id', AnneeScolaire::getActive()?->id))->with('trimestre')->orderBy('numero')->get();
-
-    return view('prefet.epreuves.create', compact('classes', 'niveaux', 'matieres', 'sequences'));
+    $epreuveComposition->load(['matiere', 'classe.section', 'enseignant.user', 'sequence.trimestre']);
+    return view('prefet.epreuves-composition.show', compact('epreuveComposition'));
 }
 
-public function epreuveStore(Request $request)
+// PrefetController — ajout
+
+public function epreuvesExamen(Request $request)
+{
+    $query = \App\Models\EpreuveExamen::with('matiere', 'niveau', 'inserePar');
+
+    if ($request->filled('niveau_id')) $query->where('niveau_id', $request->niveau_id);
+    if ($request->filled('annee_examen')) $query->where('annee_examen', $request->annee_examen);
+
+    $epreuves = $query->latest()->paginate(20);
+    $niveaux  = Niveau::orderBy('ordre')->get();
+
+    return view('prefet.epreuves-examen.index', compact('epreuves', 'niveaux'));
+}
+
+public function epreuveExamenCreate()
+{
+    $matieres = \App\Models\Matiere::orderBy('nom')->get();
+    $niveaux  = Niveau::orderBy('ordre')->get();
+
+    return view('prefet.epreuves-examen.create', compact('matieres', 'niveaux'));
+}
+
+public function epreuveExamenStore(Request $request)
 {
     $validated = $request->validate([
         'matiere_id'      => 'required|exists:matieres,id',
-        'classe_id'       => 'nullable|exists:classes,id',
         'niveau_id'       => 'required|exists:niveaux,id',
-        'sequence_id'     => 'nullable|exists:sequences,id',
         'annee_examen'    => 'required|digits:4|integer|min:2000|max:' . (date('Y') + 1),
         'titre'           => 'required|string|max:200',
         'fichier'         => 'required|file|mimes:pdf,doc,docx|max:10240',
         'fichier_corrige' => 'nullable|file|mimes:pdf,doc,docx|max:10240',
-        'archive'         => 'nullable|boolean',
     ]);
 
-    $validated['fichier'] = $request->file('fichier')->store('epreuves', 'public');
+    $validated['fichier'] = $request->file('fichier')->store('epreuves-examens', 'public');
     if ($request->hasFile('fichier_corrige')) {
-        $validated['fichier_corrige'] = $request->file('fichier_corrige')->store('epreuves', 'public');
+        $validated['fichier_corrige'] = $request->file('fichier_corrige')->store('epreuves-examens', 'public');
     }
 
-    $validated['enseignant_id']     = null; // pas d'enseignant : insérée par le préfet
-    $validated['annee_scolaire_id'] = AnneeScolaire::getActive()?->id;
-    $validated['archive']           = $request->boolean('archive', true);
+    $validated['insere_par'] = \Illuminate\Support\Facades\Auth::id();
 
-    EpreuveComposition::create($validated);
+    \App\Models\EpreuveExamen::create($validated);
 
-    return redirect()->route('prefet.epreuves.index')->with('success', 'Épreuve enregistrée.');
+    return redirect()->route('prefet.epreuves-examen.index')->with('success', 'Épreuve d\'examen enregistrée.');
+}
+
+public function epreuveExamenDestroy(EpreuveExamen $epreuveExamen)
+{
+    if ($epreuveExamen->fichier) {
+        \Storage::disk('public')->delete($epreuveExamen->fichier);
+    }
+    if ($epreuveExamen->fichier_corrige) {
+        \Storage::disk('public')->delete($epreuveExamen->fichier_corrige);
+    }
+
+    $epreuveExamen->delete();
+
+    $redirectTo = request()->input('redirect_to');
+    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+        return redirect($redirectTo)->with('success', 'Épreuve supprimée.');
+    }
+
+    return redirect()->route('prefet.epreuves-examen.index')->with('success', 'Épreuve supprimée.');
 }
 
 }

@@ -46,6 +46,9 @@ use App\Http\Controllers\Admin\EvenementController;
 //Notes & Bulletins
 use App\Http\Controllers\Teacher\SaisieNoteController;
 use App\Http\Controllers\Teacher\TravailDirigeController;
+use App\Http\Controllers\Prefet\EpreuveController;
+use App\Http\Controllers\Prefet\EpreuveExamenController;
+use App\Http\Controllers\Teacher\EpreuveCompositionController;
 
 
 //Gestion des utilisateurs
@@ -271,8 +274,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
 /**Epreuves Enseignants */
 Route::middleware(['auth','role:enseignant'])->prefix('teacher')->name('teacher.')->group(function () {
-    Route::resource('epreuves', \App\Http\Controllers\Teacher\EpreuveCompositionController::class)->only(['index','create','store','destroy']);
+    Route::resource('epreuves-composition', \App\Http\Controllers\Teacher\EpreuveCompositionController::class)->only(['index','create','store','show','destroy']);
+    Route::resource('epreuves-examen', \App\Http\Controllers\Teacher\EpreuveExamenController::class)->only(['index','create','store','show','destroy']);
 });
+
 
 /**CompteGeneration */
 Route::middleware(['auth','role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -298,7 +303,7 @@ Route::middleware(['auth', 'role:eleve'])->prefix('eleve')->name('eleve.')->grou
     Route::get('bulletins', [EleveSpaceController::class, 'bulletins'])->name('bulletins');
     Route::get('bulletins/voir', [EleveSpaceController::class, 'voirBulletin'])->name('bulletins.voir');
     Route::get('emploi-du-temps', [EleveSpaceController::class, 'emploiDuTemps'])->name('emploi-du-temps');
-    Route::get('epreuves', [EleveSpaceController::class, 'epreuves'])->name('epreuves'); // ← remplace travaux
+    Route::get('epreuves', [EleveSpaceController::class, 'epreuves'])->name('epreuves');
     Route::get('requetes', [EleveSpaceController::class, 'requetes'])->name('requetes');
     Route::post('requetes', [EleveSpaceController::class, 'storeRequete'])->name('requetes.store');
     Route::get('profil', [EleveSpaceController::class, 'profil'])->name('profil');
@@ -447,11 +452,18 @@ Route::middleware(['auth', 'role:prefet_etudes'])->name('prefet.')->group(functi
     Route::get('travaux', [PrefetController::class, 'travauxDiriges'])->name('travaux.index');
     Route::get('travaux/{travailDirige}', [PrefetController::class, 'voirTravail'])->name('travaux.show');
     Route::get('travaux/{travailDirige}/imprimer', [PrefetController::class, 'imprimerTravail'])->name('travaux.imprimer');
-    Route::get('epreuves', [PrefetController::class, 'epreuves'])->name('epreuves.index');
-    Route::get('epreuves/{epreuve}', [PrefetController::class, 'voirEpreuve'])->name('epreuves.show');
-    Route::get('epreuves/{epreuve}/imprimer', [PrefetController::class, 'imprimerEpreuve'])->name('epreuves.imprimer');
-    Route::get('prefet/epreuves/create', [PrefetController::class, 'epreuveCreate'])->name('prefet.epreuves.create');
-    Route::post('epreuves', [PrefetController::class, 'epreuveStore'])->name('epreuves.store');
+});
+//Gestion epreuve examen
+Route::middleware(['auth', 'role:prefet_etudes'])->prefix('prefet')->name('prefet.')->group(function () {
+    Route::get('epreuves-examen', [PrefetController::class, 'epreuvesExamen'])->name('epreuves-examen.index');
+    Route::get('epreuves-examen/create', [PrefetController::class, 'epreuveExamenCreate'])->name('epreuves-examen.create');
+    Route::post('epreuves-examen', [PrefetController::class, 'epreuveExamenStore'])->name('epreuves-examen.store');
+    Route::get('epreuves-examen/{epreuveExamen}', [PrefetController::class, 'epreuveExamenShow'])->name('epreuves-examen.show');
+    Route::delete('epreuves-examen/{epreuveExamen}', [PrefetController::class, 'epreuveExamenDestroy'])->name('epreuves-examen.destroy');
+    
+    //Consultation epreuve de composition
+    Route::get('epreuves-composition', [PrefetController::class, 'epreuvesComposition'])->name('epreuves-composition.index');
+    Route::get('epreuves-composition/{epreuveComposition}', [PrefetController::class, 'epreuveCompositionShow'])->name('epreuves-composition.show');
 });
 
 // // Accès partagés avec l'admin (bulletins, tableau d'honneur, cartes scolaires, procès-verbaux)

@@ -2,9 +2,9 @@
 @section('title', 'Épreuves de composition')
 @section('content')
 <div class="card">
-    <div class="flex justify-between items-center mb-4">
-        <h3 class="font-semibold text-gray-800">Épreuves de composition</h3>
-
+    <div class="mb-4">
+        <h3 class="font-semibold text-gray-800">Épreuves de composition — envoyées par les enseignants</h3>
+        <p class="text-sm text-gray-500">Consultation uniquement — vous ne pouvez pas ajouter, modifier ou supprimer.</p>
     </div>
 
     <form method="GET" class="flex gap-3 mb-4">
@@ -25,21 +25,18 @@
                 @forelse ($epreuves as $e)
                 <tr>
                     <td class="font-medium">{{ $e->titre }}</td>
-                    <td>{{ $e->matiere->nom }}</td>
-                    <td>{{ $e->classe->nom ?? '-' }}</td>
-                    <td>{{ $e->sequence->nom ?? '-' }}</td>
-                    <td>{{ $e->enseignant->user->name ?? 'Préfecture' }}</td>
+                    <td>{{ $e->matiere?->nom ?? 'Aucune matière' }}</td>
+                    <td>{{ $e->classe?->nom ?? 'Aucune classe' }}</td>
+                    <td>{{ $e->sequence?->nom ?? 'Aucune séquence' }}</td>
+                    <td>{{ $e->enseignant?->user?->name ?? 'Aucun enseignant' }}</td>
                     <td class="text-right">
-                        <a href="{{ asset('storage/'.$e->fichier) }}" target="_blank" class="login-link mr-2">
-                            <i data-lucide="download" class="w-3 h-3 inline"></i> Télécharger
+                        <a href="{{ route('prefet.epreuves-composition.show', $e) }}" class="login-link">
+                            <i data-lucide="eye" class="w-5 h-5"></i>
                         </a>
-                        @if($e->fichier_corrige)
-                        <a href="{{ asset('storage/'.$e->fichier_corrige) }}" target="_blank" class="login-link">Corrigé</a>
-                        @endif
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="6" class="text-center text-gray-400 py-6">Aucune épreuve.</td></tr>
+                <tr><td colspan="6" class="text-center text-gray-400 py-6">Aucune épreuve reçue.</td></tr>
                 @endforelse
             </tbody>
         </table>

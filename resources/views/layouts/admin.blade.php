@@ -178,9 +178,12 @@
     @role('enseignant')
     <p class="sidebar-section-title">Mon espace</p>
 
-    <a href="{{ route('teacher.epreuves.index') }}" class="sidebar-link {{ request()->routeIs('teacher.epreuves.*') ? 'sidebar-link-active' : '' }}">
-       <i data-lucide="file-plus" class="w-5 h-5"></i> Épreuves de composition
+    <!-- <a href="{{ route('teacher.epreuves-composition.index') }}" class="sidebar-link {{ request()->routeIs('teacher.epreuves-composition.*') ? 'sidebar-link-active' : '' }}">
+        <i data-lucide="file-plus" class="w-5 h-5"></i> Épreuves de composition
     </a>
+    <a href="{{ route('teacher.epreuves-examen.index') }}" class="sidebar-link {{ request()->routeIs('teacher.epreuves-examen.*') ? 'sidebar-link-active' : '' }}">
+        <i data-lucide="archive" class="w-5 h-5"></i> Épreuves d'examen
+    </a> -->
     <a href="{{ route('teacher.saisie.index') }}" class="sidebar-link {{ request()->routeIs('teacher.saisie.*') ? 'sidebar-link-active' : '' }}">
         <i data-lucide="pencil-line" class="w-5 h-5"></i> Saisie des notes
     </a>
