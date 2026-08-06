@@ -106,14 +106,14 @@
                             <td>{{ $sc->classe->nom }}</td>
                             <td>
                                 @php $s = $sc->statutTranche('inscription'); @endphp
-                                <span class="{{ $badge[$s] }}">
+                                <span class="badge {{ $badge[$s] }}">
                                     {{ $s === 'paye' ? '✓' : number_format($sc->frais_inscription - $sc->paye_inscription, 0) }}
                                 </span>
                             </td>
                             @foreach (['tranche1','tranche2','tranche3'] as $t)
                                 <td>
                                     @php $s = $sc->statutTranche($t); @endphp
-                                    <span class="{{ $badge[$s] }}">
+                                    <span class=" badge {{ $badge[$s] }}">
                                         @if($s === 'paye') ✓
                                         @elseif($s === 'na') -
                                         @else {{ number_format($sc->{"montant_{$t}"} - $sc->{"paye_{$t}"}, 0) }}

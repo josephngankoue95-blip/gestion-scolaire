@@ -225,6 +225,14 @@
                         @error('site_web') <p class="error-text">{{ $message }}</p> @enderror
                     </div>
                 </div>
+                <div class="form-group">
+                    <label class="form-label">Signature du Proviseur/Principal (scan)</label>
+                    @if($etablissement->signature_proviseur)
+                        <img src="{{ asset('storage/'.$etablissement->signature_proviseur) }}" style="height:60px;margin-bottom:8px;display:block;">
+                    @endif
+                    <input type="file" name="signature_proviseur" accept="image/*" class="form-input">
+                    <p class="text-xs text-gray-400 mt-1">Format PNG recommandé avec fond transparent.</p>
+                </div>
             </div>
         </div>
         </div>

@@ -3,86 +3,81 @@
 <head>
 <meta charset="UTF-8">
 <style>
-@page { size: A4 landscape; margin:0; }
+@page { size: A4 landscape; margin: 0; }
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:'DejaVu Sans', Arial, sans-serif; color:#111; }
 
 .page {
-    width:297mm; height:210mm;
+    width:272mm; height:190mm; /* légèrement réduit vs 210mm pour éviter tout débordement */
     position:relative;
     page-break-after:always;
-    padding:10mm 14mm;
+    padding:8mm 12mm;
+    overflow:hidden;
 }
 .page:last-child { page-break-after:auto; }
 
-.border-outer { position:absolute; top:6mm; left:6mm; right:6mm; bottom:6mm; border:2px solid #123d75; border-radius:4px; }
+.border-outer { position:absolute; top:5mm; left:5mm; right:5mm; bottom:5mm; border:2px solid #123d75; border-radius:4px; }
 
-.header-table { width:100%; border-collapse:collapse; margin-top:4mm; }
-.header-left { width:66%; }
+.header-table { width:100%; border-collapse:collapse; margin-top:3mm; }
+.header-left { width:66%; vertical-align:top; }
 .header-right { width:34%; text-align:right; vertical-align:top; }
 
-.rep-line { font-size:11px; font-weight:bold; color:#123d75; }
-.devise-line { font-size:9px; color:#555; }
-.school { font-size:26px; font-weight:800; color:#123d75; margin-top:1mm; }
-.souligne { font-size:10px; color:#555; margin-top:1mm; }
+.rep-line { font-size:10px; font-weight:bold; color:#123d75; }
+.devise-line { font-size:8px; color:#555; }
+.school { font-size:22px; font-weight:800; color:#123d75; margin-top:1mm; }
+.souligne { font-size:9px; color:#555; margin-top:1mm; }
 
-/* Remplace .flag-img (flex) par table */
-.flag-img-table {
-    width:32mm; border-collapse:collapse; border:1px solid #999; margin-left:auto;
-}
-.flag-img-table td { width:10.66mm; height:20mm; padding:0; }
+.flag-img-table { width:26mm; border-collapse:collapse; border:1px solid #999; margin-left:auto; }
+.flag-img-table td { width:8.66mm; height:16mm; padding:0; }
 .flag-green { background:#007a5e; }
 .flag-red { background:#ce1126; text-align:center; vertical-align:middle; }
-.flag-star { color:#fcd116; font-size:16px; }
+.flag-star { color:#fcd116; font-size:13px; }
 .flag-yellow { background:#fcd116; }
 
-.ruban-wrap { text-align:center; margin-top:8mm; }
+.ruban-wrap { text-align:center; margin-top:5mm; }
 .ruban {
     display:inline-block;
     background:#123d75;
     color:#fff;
-    padding:4mm 14mm;
-    font-size:20px;
+    padding:3mm 12mm;
+    font-size:17px;
     font-weight:bold;
     letter-spacing:1px;
     clip-path: polygon(3% 0, 97% 0, 100% 50%, 97% 100%, 3% 100%, 0 50%);
 }
-.ruban-sub { font-size:12px; color:#123d75; margin-top:2mm; font-weight:bold; }
-.annee-scolaire { text-align:center; font-size:11px; color:#555; margin-top:2mm; }
+.ruban-sub { font-size:10px; color:#123d75; margin-top:1.5mm; font-weight:bold; }
+.annee-scolaire { text-align:center; font-size:9px; color:#555; margin-top:1.5mm; }
 
-.corps-table { width:100%; margin-top:8mm; }
+.corps-table { width:100%; margin-top:5mm; }
 .left-info { width:32%; vertical-align:top; }
-.right-content { width:68%; vertical-align:top; text-align:center; }
+.right-content { width:68%; vertical-align:top; text-align:center; padding-left:6mm; }
 
-.info-box {
-    border:1px solid #ccc;
-    border-radius:6px;
-    padding:4mm;
-}
-.info-box .item { margin-bottom:4mm; }
-.info-box .lbl { font-size:9px; color:#666; }
-.info-box .val { font-size:12px; font-weight:bold; color:#111; border-bottom:1px solid #eee; padding-bottom:1mm; }
-.info-box .val.big { font-size:20px; color:#123d75; }
+.info-box { border:1px solid #ccc; border-radius:6px; padding:3mm; }
+.info-box .item { margin-bottom:3mm; }
+.info-box .lbl { font-size:8px; color:#666; }
+.info-box .val { font-size:10.5px; font-weight:bold; color:#111; border-bottom:1px solid #eee; padding-bottom:1mm; }
+.info-box .val.big { font-size:17px; color:#123d75; }
 
-.intro { font-size:12px; color:#333; margin-bottom:3mm; }
-.eleve-nom { font-size:26px; font-weight:800; color:#123d75; margin:3mm 0; }
-.texte-merite { font-size:11px; color:#333; line-height:1.7; max-width:160mm; margin:0 auto; }
-.encouragement { font-style:italic; font-size:11px; color:#555; margin-top:4mm; }
+.intro { font-size:10.5px; color:#333; margin-bottom:2.5mm; }
+.eleve-nom { font-size:21px; font-weight:800; color:#123d75; margin:2.5mm 0; }
+.texte-merite { font-size:9.5px; color:#333; line-height:1.55; max-width:150mm; margin:0 auto; }
+.encouragement { font-style:italic; font-size:9.5px; color:#555; margin-top:3mm; line-height:1.5; }
 
-.sign-table { width:100%; margin-top:14mm; }
-.sign-cell { text-align:center; font-size:9px; }
-.sign-line { border-top:1px solid #333; margin-top:2mm; padding-top:1mm; font-size:8.5px; color:#555; }
+.sign-table { width:100%; margin-top:8mm; }
+.sign-cell { text-align:center; font-size:8.5px; }
+.sign-line { border-top:1px solid #333; margin-top:1.5mm; padding-top:1mm; font-size:8px; color:#555; }
 
-.date-fait { text-align:right; font-size:10px; color:#333; margin-top:6mm; }
+.date-fait { text-align:right; font-size:9px; color:#333; margin-top:4mm; }
 </style>
 </head>
 <body>
 
-@foreach ($resultats as $r)
+@foreach ($resultats as $index => $r)
 @php
     $eleve = $r['eleve'];
     $moy   = $r['bulletin']['moyenne_generale'] ?? 0;
-    $rang  = $r['rang'] ?? '-';
+    $rang  = $r['rang'] ?? ($index + 1); // fallback fiable si rang non transmis
+    $totalEleves = count($resultats);
     $mention = match(true){
         $moy >= 16 => 'EXCELLENTE',
         $moy >= 14 => 'TRÈS BIEN',
@@ -127,7 +122,7 @@ body { font-family:'DejaVu Sans', Arial, sans-serif; color:#111; }
                     <div class="item"><div class="lbl">CLASSE :</div><div class="val">{{ $classe->nom }}</div></div>
                     <div class="item"><div class="lbl">ANNÉE SCOLAIRE :</div><div class="val">{{ $classe->anneeScolaire->libelle }}</div></div>
                     <div class="item"><div class="lbl">MOYENNE GÉNÉRALE :</div><div class="val big">{{ number_format($moy,2) }} /20</div></div>
-                    <div class="item"><div class="lbl">RANG :</div><div class="val">{{ $rang }}<sup>{{ $rang == 1 ? 'er' : 'e' }}</sup> / {{ count($resultats) }}</div></div>
+                    <div class="item"><div class="lbl">RANG :</div><div class="val">{{ $rang }}<sup>{{ $rang == 1 ? 'er' : 'e' }}</sup> / {{ $totalEleves }}</div></div>
                     <div class="item"><div class="lbl">MENTION :</div><div class="val">{{ $mention }}</div></div>
                 </div>
             </td>

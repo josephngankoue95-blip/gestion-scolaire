@@ -40,6 +40,7 @@ class EtablissementController extends Controller
             'code_etablissement'        => 'nullable|string|max:50',
             'devise'                    => 'nullable|string|max:255',
             'logo'                      => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+            'signature_proviseur'       => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
 
             'nom_universite'            => 'nullable|string|max:200',
             'sigle_universite'          => 'nullable|string|max:20',
@@ -76,6 +77,13 @@ class EtablissementController extends Controller
             }
             $validated['logo_universite_partenaire'] = $request->file('logo_universite_partenaire')->store('etablissement', 'public');
         }
+
+        if ($request->hasFile('signature_proviseur')) {
+    if ($etablissement?->signature_proviseur) {
+        Storage::disk('public')->delete($etablissement->signature_proviseur);
+    }
+    $validated['signature_proviseur'] = $request->file('signature_proviseur')->store('signatures', 'public');
+}
 
         $etablissement->update($validated);
 
