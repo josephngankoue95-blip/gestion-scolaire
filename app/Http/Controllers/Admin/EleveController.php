@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ElevesExport;
+use App\Imports\ElevesImport;
 
 class EleveController extends Controller
 {
@@ -66,13 +68,6 @@ $query = Eleve::whereHas('scolarites', function ($q) use ($annee, $request) {
     return view('admin.eleves.index', compact('eleves', 'classes'));
 }
 
-    public function export(Request $request)
-    {
-        return Excel::download(
-            new ElevesExport($request->only(['search', 'classe_id'])),
-            'eleves.xlsx'
-        );
-    }
 
 public function create()
 {
@@ -340,4 +335,55 @@ public function update(Request $request, Eleve $eleve)
         return redirect()->route('admin.eleves.index')
             ->with('success', 'Élève supprimé.');
     }
+
+    // ── EXPORT ──
+public function export(Request $request)
+{
+    return Excel::download(
+        new ElevesExport($request->only(['search', 'classe_id', 'statut'])),
+        'eleves_' . now()->format('Ymd_His') . '.xlsx'
+    );
+}
+
+// ── IMPORT ──
+public function importForm()
+{
+    return view('admin.eleves.import');
+}
+
+public function importStore(Request $request)
+{
+    $request->validate([
+        'fichier' => 'required|file|mimes:xlsx,xls,csv|max:5120',
+    ]);
+
+    $import = new ElevesImport();
+    Excel::import($import, $request->file('fichier'));
+
+    $erreurs = $import->failures();
+
+    $msg = "{$import->getNbImportes()} élève(s) importé(s) avec succès.";
+
+    if ($erreurs->isNotEmpty()) {
+        $msg .= " {$erreurs->count()} ligne(s) en erreur.";
+        return back()->with('warning', $msg)->with('erreurs_import', $erreurs);
+    }
+
+    return redirect()->route('admin.eleves.index')->with('success', $msg);
+}
+
+public function importModele()
+{
+    $headers = ['Content-Type' => 'text/csv; charset=UTF-8'];
+    $callback = function () {
+        $file = fopen('php://output', 'w');
+        fwrite($file, "\xEF\xBB\xBF");
+        fputcsv($file, ['nom','prenom','sexe','date_naissance','lieu_naissance','telephone_parent','adresse','classe'], ';');
+        fputcsv($file, ['NGONO','Paul','M','15/03/2012','Douala','677000000','Akwa, Douala','6ème A'], ';');
+        fclose($file);
+    };
+    return response()->stream($callback, 200, array_merge($headers, [
+        'Content-Disposition' => 'attachment; filename="modele_import_eleves.csv"',
+    ]));
+}
 }

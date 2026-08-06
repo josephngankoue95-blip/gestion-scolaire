@@ -7,29 +7,43 @@ use App\Models\AnneeScolaire;
 use App\Models\Sequence;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class EpreuveCompositionController extends Controller
 {
     public function index()
-{
-    $enseignant = Auth::user()->enseignant;
-    $annee = AnneeScolaire::getActive();
+    {
+        $enseignant = Auth::user()->enseignant;
+        abort_if(!$enseignant, 403, "Votre compte n'est pas relié à une fiche enseignant.");
 
-    $epreuves = EpreuveComposition::where('enseignant_id', $enseignant->id)
-        ->where('annee_scolaire_id', $annee?->id)
-        ->with(['matiere', 'classe.section', 'sequence.trimestre']) // ← chargement explicite
-        ->latest()
-        ->paginate(15);
+        $annee = AnneeScolaire::getActive();
 
-    return view('teacher.epreuves-composition.index', compact('epreuves'));
-}
+        $epreuves = EpreuveComposition::where('enseignant_id', $enseignant->id)
+            ->where('annee_scolaire_id', $annee?->id)
+            ->with(['matiere', 'classe.section', 'sequence.trimestre'])
+            ->latest()
+            ->paginate(15);
+
+        return view('teacher.epreuves-composition.index', compact('epreuves'));
+    }
 
     public function create()
     {
-        $enseignant   = Auth::user()->enseignant;
-        $annee        = AnneeScolaire::getActive();
-        $affectations = $enseignant->affectations()->where('annee_scolaire_id', $annee?->id)->with('matiere','classe.section')->get();
-        $sequences    = Sequence::whereHas('trimestre', fn($q) => $q->where('annee_scolaire_id', $annee?->id))->with('trimestre')->orderBy('numero')->get();
+        $enseignant = Auth::user()->enseignant;
+        abort_if(!$enseignant, 403);
+
+        $annee = AnneeScolaire::getActive();
+
+        $affectations = $enseignant->affectations()
+            ->where('annee_scolaire_id', $annee?->id)
+            ->with(['matiere', 'classe.section'])
+            ->get()
+            ->filter(fn($a) => $a->matiere && $a->classe); // filtre les affectations cassées
+
+        $sequences = Sequence::whereHas('trimestre', fn($q) => $q->where('annee_scolaire_id', $annee?->id))
+            ->with('trimestre')
+            ->orderBy('numero')
+            ->get();
 
         return view('teacher.epreuves-composition.create', compact('affectations', 'sequences'));
     }
@@ -37,6 +51,7 @@ class EpreuveCompositionController extends Controller
     public function store(Request $request)
     {
         $enseignant = Auth::user()->enseignant;
+        abort_if(!$enseignant, 403);
 
         $validated = $request->validate([
             'matiere_id'      => 'required|exists:matieres,id',
@@ -63,37 +78,29 @@ class EpreuveCompositionController extends Controller
 
         EpreuveComposition::create($validated);
 
-        return redirect()->route('teacher.epreuves-composition.index')->with('success', 'Épreuve de composition enregistrée.');
+        return redirect()->route('teacher.epreuves-composition.index')->with('success', 'Épreuve enregistrée.');
     }
 
     public function show(EpreuveComposition $epreuveComposition)
-{
-    abort_if($epreuveComposition->enseignant_id !== Auth::user()->enseignant?->id, 403);
-
-    $epreuveComposition->load(['matiere', 'classe.section', 'sequence.trimestre']);
-
-    return view('teacher.epreuves-composition.show', compact('epreuveComposition'));
-}
-
-public function destroy(EpreuveComposition $epreuveComposition)
-{
-    abort_if($epreuveComposition->enseignant_id !== Auth::user()->enseignant?->id, 403);
-
-    if ($epreuveComposition->fichier) {
-        \Storage::disk('public')->delete($epreuveComposition->fichier);
-    }
-    if ($epreuveComposition->fichier_corrige) {
-        \Storage::disk('public')->delete($epreuveComposition->fichier_corrige);
+    {
+        abort_if($epreuveComposition->enseignant_id !== Auth::user()->enseignant?->id, 403);
+        $epreuveComposition->load(['matiere', 'classe.section', 'sequence.trimestre']);
+        return view('teacher.epreuves-composition.show', compact('epreuveComposition'));
     }
 
-    $epreuveComposition->delete();
+    public function destroy(EpreuveComposition $epreuveComposition)
+    {
+        abort_if($epreuveComposition->enseignant_id !== Auth::user()->enseignant?->id, 403);
 
-    $redirectTo = request()->input('redirect_to');
-    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
-        return redirect($redirectTo)->with('success', 'Épreuve supprimée.');
+        if ($epreuveComposition->fichier) Storage::disk('public')->delete($epreuveComposition->fichier);
+        if ($epreuveComposition->fichier_corrige) Storage::disk('public')->delete($epreuveComposition->fichier_corrige);
+
+        $epreuveComposition->delete();
+
+        $redirectTo = request()->input('redirect_to');
+        if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+            return redirect($redirectTo)->with('success', 'Épreuve supprimée.');
+        }
+        return redirect()->route('teacher.epreuves-composition.index')->with('success', 'Épreuve supprimée.');
     }
-
-    return redirect()->route('teacher.epreuves-composition.index')->with('success', 'Épreuve supprimée.');
-}
-
 }

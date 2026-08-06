@@ -7,12 +7,13 @@ use App\Models\Niveau;
 use App\Models\Matiere;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class EpreuveExamenController extends Controller
 {
     public function index(Request $request)
     {
-        $query = EpreuveExamen::with('matiere', 'niveau', 'inserePar');
+        $query = EpreuveExamen::with(['matiere', 'niveau', 'inserePar']);
 
         if ($request->filled('niveau_id')) $query->where('niveau_id', $request->niveau_id);
         if ($request->filled('annee_examen')) $query->where('annee_examen', $request->annee_examen);
@@ -55,28 +56,22 @@ class EpreuveExamenController extends Controller
     }
 
     public function show(EpreuveExamen $epreuveExamen)
-{
-    $epreuveExamen->load(['matiere', 'niveau', 'inserePar']);
-    return view('teacher.epreuves-examen.show', compact('epreuveExamen'));
-}
-
-public function destroy(EpreuveExamen $epreuveExamen)
-{
-    if ($epreuveExamen->fichier) {
-        \Storage::disk('public')->delete($epreuveExamen->fichier);
-    }
-    if ($epreuveExamen->fichier_corrige) {
-        \Storage::disk('public')->delete($epreuveExamen->fichier_corrige);
+    {
+        $epreuveExamen->load(['matiere', 'niveau', 'inserePar']);
+        return view('teacher.epreuves-examen.show', compact('epreuveExamen'));
     }
 
-    $epreuveExamen->delete();
+    public function destroy(EpreuveExamen $epreuveExamen)
+    {
+        if ($epreuveExamen->fichier) Storage::disk('public')->delete($epreuveExamen->fichier);
+        if ($epreuveExamen->fichier_corrige) Storage::disk('public')->delete($epreuveExamen->fichier_corrige);
 
-    $redirectTo = request()->input('redirect_to');
-    if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
-        return redirect($redirectTo)->with('success', 'Épreuve supprimée.');
+        $epreuveExamen->delete();
+
+        $redirectTo = request()->input('redirect_to');
+        if ($redirectTo && str_starts_with($redirectTo, url('/'))) {
+            return redirect($redirectTo)->with('success', 'Épreuve supprimée.');
+        }
+        return redirect()->route('teacher.epreuves-examen.index')->with('success', 'Épreuve supprimée.');
     }
-
-    return redirect()->route('teacher.epreuves-examen.index')->with('success', 'Épreuve supprimée.');
-}
-
 }

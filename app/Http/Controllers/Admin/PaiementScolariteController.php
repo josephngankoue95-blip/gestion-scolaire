@@ -42,6 +42,14 @@ class PaiementScolariteController extends Controller
 
         $scolarite->increment($champPaye, $validated['montant']);
 
+        // Dans PaiementScolariteController::store() — notifie l'admin/secrétaire
+        $user->notify(new \App\Notifications\NouvelleActionNotification(
+            'Nouveau paiement',
+            "{$scolarite->eleve->nomComplet()} a payé {$validated['montant']} FCFA",
+            route('admin.scolarite.show', $scolarite),
+            'wallet', 'green'
+        ));
+
         return back()->with('success', "Paiement enregistré. N° Reçu : {$paiement->numero_recu}");
     }
 

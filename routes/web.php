@@ -42,6 +42,7 @@ use App\Http\Controllers\Parent\PaiementMobileController;
 use App\Http\Controllers\Admin\PaiementMobileAdminController;
 use App\Http\Controllers\Public\SitePublicController;
 use App\Http\Controllers\Admin\EvenementController;
+use App\Http\Controllers\NotificationController;
 
 //Notes & Bulletins
 use App\Http\Controllers\Teacher\SaisieNoteController;
@@ -50,6 +51,12 @@ use App\Http\Controllers\Prefet\EpreuveController;
 use App\Http\Controllers\Prefet\EpreuveExamenController;
 use App\Http\Controllers\Teacher\EpreuveCompositionController;
 
+
+//Notifications
+Route::middleware(['auth'])->group(function () {
+    Route::post('notifications/{id}/lire', [\App\Http\Controllers\NotificationController::class, 'lire'])->name('notifications.lire');
+    Route::post('notifications/tout-lu', [\App\Http\Controllers\NotificationController::class, 'marquerToutLu'])->name('notifications.marquer-tout-lu');
+});
 
 //Gestion des utilisateurs
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
@@ -272,6 +279,19 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
 });
 
+//Export/Import Eleves
+Route::middleware(['auth','role:admin|secretaire_intendant'])->prefix('admin')->name('admin.')->group(function () {
+
+    // ── OBLIGATOIREMENT avant Route::resource ──
+    Route::get('eleves/export', [EleveController::class, 'export'])->name('eleves.export');
+    Route::get('eleves/import/modele', [EleveController::class, 'importModele'])->name('eleves.import.modele');
+    Route::get('eleves/import', [EleveController::class, 'importForm'])->name('eleves.import.form');
+    Route::post('eleves/import', [EleveController::class, 'importStore'])->name('eleves.import.store');
+
+    // ── Ensuite seulement ──
+    Route::resource('eleves', EleveController::class);
+});
+
 /**Epreuves Enseignants */
 Route::middleware(['auth','role:enseignant'])->prefix('teacher')->name('teacher.')->group(function () {
     Route::resource('epreuves-composition', \App\Http\Controllers\Teacher\EpreuveCompositionController::class)->only(['index','create','store','show','destroy']);
@@ -284,8 +304,10 @@ Route::middleware(['auth','role:admin'])->prefix('admin')->name('admin.')->group
     Route::get('comptes-generes', [CompteGenereController::class, 'index'])->name('comptes-generes.index');
     Route::get('comptes-generes/export-pdf', [CompteGenereController::class, 'exportPdf'])->name('comptes-generes.export-pdf');
     Route::get('comptes-generes/export-excel', [CompteGenereController::class, 'exportExcel'])->name('comptes-generes.export-excel');
-    Route::post('comptes-generes/purger', [CompteGenereController::class, 'purger'])->name('comptes-generes.purger');
+    Route::post('comptes-generes/{compteGenere}/envoyer-mail', [CompteGenereController::class, 'envoyerParMail'])->name('comptes-generes.envoyer-mail');
+    Route::post('comptes-generes/envoyer-groupe', [CompteGenereController::class, 'envoyerGroupe'])->name('comptes-generes.envoyer-groupe');
     Route::delete('comptes-generes/{compteGenere}', [CompteGenereController::class, 'destroy'])->name('comptes-generes.destroy');
+    Route::post('comptes-generes/{compteGenere}/envoyer-sms', [CompteGenereController::class, 'envoyerParSms'])->name('comptes-generes.envoyer-sms');
 });
 
 /**NIVEAUX DE CLASSE */

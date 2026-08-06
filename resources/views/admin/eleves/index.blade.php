@@ -5,9 +5,15 @@
 <div class="card">
     <div class="row-between mb-6">
         <h3 class="font-semibold text-gray-800">Gestion des élèves</h3>
-        <a href="{{ route('admin.eleves.create') }}" class="btn btn-primary">
-            Ajouter un élève
+    <div class="flex gap-2">
+        <a href="{{ route('admin.eleves.import.form') }}" class="btn-outline">
+            <i data-lucide="upload" class="w-4 h-4"></i> Importer Excel
         </a>
+        <a href="{{ route('admin.eleves.export', request()->all()) }}" class="btn-outline">
+            <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Exporter Excel
+        </a>
+        <a href="{{ route('admin.eleves.create') }}" class="btn-primary">+ Nouvel élève</a>
+    </div>
     </div>
 
     <form method="GET" id="filterForm" class="mb-5 flex flex-wrap gap-3 items-center">

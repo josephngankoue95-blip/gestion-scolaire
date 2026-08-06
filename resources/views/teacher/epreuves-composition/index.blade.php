@@ -16,21 +16,19 @@
                 @forelse ($epreuves as $e)
                 <tr>
                     <td class="font-medium">{{ $e->titre }}</td>
-                    <td>{{ $e->matiere?->nom }}</td>
-                    <td>{{ $e->classe?->nom }}</td>
-                    <td>{{ $e->sequence?->nom }}</td>
+                    <td>{{ $e->matiere?->nom ?? '—' }}</td>
+                    <td>{{ $e->classe?->nom ?? '—' }}</td>
+                    <td>{{ $e->sequence?->nom ?? '—' }}</td>
                     <td class="text-right">
-                        <div class="flex items-center gap-2">
-                            <a href="{{ route('teacher.epreuves-composition.show', $e) }}" class="login-link mr-2">
+                        <div class="flex items-center gap-2 justify-end">
+                            <a href="{{ route('teacher.epreuves-composition.show', $e) }}" class="login-link">
                                 <i data-lucide="eye" class="w-4 h-4"></i>
                             </a>
                             <form method="POST" action="{{ route('teacher.epreuves-composition.destroy', $e) }}"
-                                class="inline"
-                                data-confirm-delete
-                                data-confirm-message="Supprimer l'épreuve « {{ $e->titre }} » ?">
+                                  class="inline" data-confirm-delete data-confirm-message="Supprimer l'épreuve « {{ $e->titre }} » ?">
                                 @csrf @method('DELETE')
                                 <input type="hidden" name="redirect_to" value="{{ url()->full() }}">
-                                <button type="button" class="text-red-500" onclick="this.closest('form').requestSubmit()">Suppr.</button>
+                                <button type="button" class="text-red-500" onclick="this.closest('form').requestSubmit()"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </form>
                         </div>
                     </td>

@@ -15,37 +15,29 @@
             <option value="">Tous les niveaux</option>
             @foreach ($niveaux as $n)<option value="{{ $n->id }}" {{ request('niveau_id')==$n->id?'selected':'' }}>{{ $n->nom }}</option>@endforeach
         </select>
-        <input type="number" name="annee_examen" value="{{ request('annee_examen') }}" placeholder="Année (ex: 2022)" class="form-input" style="max-width:160px;">
+        <input type="number" name="annee_examen" value="{{ request('annee_examen') }}" placeholder="Année" class="form-input" style="max-width:150px;">
         <button type="submit" class="btn-outline">Filtrer</button>
     </form>
 
     <div class="table-wrapper">
         <table class="table-base">
-            <thead><tr><th>Titre</th><th>Matière</th><th>Niveau</th><th>Année</th><th>Inséré par</th></tr></thead>
+            <thead><tr><th>Titre</th><th>Matière</th><th>Niveau</th><th>Année</th><th>Inséré par</th><th></th></tr></thead>
             <tbody>
                 @forelse ($epreuves as $e)
                 <tr>
                     <td class="font-medium">{{ $e->titre }}</td>
-                    <td>{{ $e->matiere->nom }}</td>
-                    <td>{{ $e->niveau->nom }}</td>
+                    <td>{{ $e->matiere?->nom ?? '—' }}</td>
+                    <td>{{ $e->niveau?->nom ?? '—' }}</td>
                     <td><span class="badge badge-amber">{{ $e->annee_examen }}</span></td>
-                    <td>{{ $e->inserePar->name }}</td>
+                    <td>{{ $e->inserePar?->name ?? '—' }}</td>
                     <td class="text-right">
-                        <div class="flex items-center gap-2">
-                            <a href="{{ route('teacher.epreuves-examen.show', $e) }}" class="login-link mr-2">
-                                <i data-lucide="eye" class="w-4 h-4"></i>
-                            </a>
+                        <div class="flex items-center gap-2 justify-end">
+                            <a href="{{ route('teacher.epreuves-examen.show', $e) }}" class="login-link"><i data-lucide="eye" class="w-4 h-4"></i></a>
                             <form method="POST" action="{{ route('teacher.epreuves-examen.destroy', $e) }}"
-                                class="inline"
-                                data-confirm-delete
-                                data-confirm-message="Supprimer l'épreuve « {{ $e->titre }} » ?">
+                                  class="inline" data-confirm-delete data-confirm-message="Supprimer l'épreuve « {{ $e->titre }} » ?">
                                 @csrf @method('DELETE')
                                 <input type="hidden" name="redirect_to" value="{{ url()->full() }}">
-                                <button type="button" class="text-red-500" onclick="this.closest('form').requestSubmit()">
-                                    <span class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-red-100 text-red-600 hover:bg-red-200 transition">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </span>
-                                </button>
+                                <button type="button" class="text-red-500" onclick="this.closest('form').requestSubmit()"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                             </form>
                         </div>
                     </td>

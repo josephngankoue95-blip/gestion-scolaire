@@ -21,12 +21,9 @@
                 </select>
             </div>
         </div>
-        <div class="form-group">
-            <label class="form-label">Année de l'examen *</label>
-            <input type="number" name="annee_examen" required class="form-input" placeholder="ex: 2022" min="2000" max="{{ date('Y')+1 }}">
-        </div>
-        <div class="form-group"><label class="form-label">Titre *</label><input name="titre" required class="form-input" placeholder="ex: Composition Maths 2022"></div>
-        <div class="form-group"><label class="form-label">Fichier épreuve (PDF/Word) *</label><input type="file" name="fichier" required accept=".pdf,.doc,.docx" class="form-input"></div>
+        <div class="form-group"><label class="form-label">Année de l'examen *</label><input type="number" name="annee_examen" required class="form-input" placeholder="ex: 2022" min="2000" max="{{ date('Y')+1 }}"></div>
+        <div class="form-group"><label class="form-label">Titre *</label><input name="titre" required class="form-input"></div>
+        <div class="form-group"><label class="form-label">Fichier épreuve *</label><input type="file" name="fichier" required accept=".pdf,.doc,.docx" class="form-input"></div>
         <div class="form-group"><label class="form-label">Fichier corrigé (optionnel)</label><input type="file" name="fichier_corrige" accept=".pdf,.doc,.docx" class="form-input"></div>
         <div class="flex gap-3">
             <x-retour-button fallback-route="teacher.epreuves-examen.index" label="Annuler" />

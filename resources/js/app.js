@@ -320,3 +320,33 @@ window.AppLycee = {
     initPhotoPreview,
     initNotePreview,
 };
+
+// ══════ ANIMATIONS DASHBOARD UNIVERSELLES ══════
+document.addEventListener('DOMContentLoaded', function () {
+
+    // Compteurs animés — s'applique automatiquement partout où .counter existe
+    document.querySelectorAll('.counter').forEach(el => {
+        const target = parseInt(el.dataset.target || el.textContent.replace(/\D/g,'') || '0', 10);
+        if (isNaN(target)) return;
+        let current = 0;
+        const step = Math.max(1, Math.ceil(target / 40));
+        const timer = setInterval(() => {
+            current += step;
+            if (current >= target) { current = target; clearInterval(timer); }
+            el.textContent = current.toLocaleString('fr-FR');
+        }, 25);
+    });
+
+    // Barres de progression animées
+    setTimeout(() => {
+        document.querySelectorAll('.animated-bar').forEach(bar => bar.classList.add('filled'));
+    }, 200);
+
+    // Horloge live si présente
+    const clock = document.getElementById('live-clock');
+    if (clock) {
+        setInterval(() => {
+            clock.textContent = new Date().toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+        }, 30000);
+    }
+});

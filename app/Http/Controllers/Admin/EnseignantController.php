@@ -52,6 +52,13 @@ class EnseignantController extends Controller
         'actif'     => true,
     ]);
     $user->assignRole('enseignant');
+    CompteGenere::create([
+    'user_id'      => $user->id,
+    'nom'          => $user->name,
+    'email'        => $user->email,
+    'mot_de_passe' => $motDePasse, // celui généré via Str::random()
+    'role'         => 'enseignant',
+]);
 
     $enseignant = \App\Models\Enseignant::create([
         'user_id'   => $user->id,

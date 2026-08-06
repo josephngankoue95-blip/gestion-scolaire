@@ -18,6 +18,7 @@
             style="width:60px; height:60px; object-fit:cover; border-radius:50%;">
         </div>
         </div>
+ 
         <nav class="sidebar-nav">
             <a href="{{ route('parent.dashboard') }}" class="sidebar-link {{ request()->routeIs('parent.dashboard') ? 'sidebar-link-active' : '' }}">
                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Tableau de bord
