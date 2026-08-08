@@ -49,3 +49,5 @@ RUN chmod -R 775 /var/www/html/storage \
 EXPOSE 80
 
 CMD ["apache2-foreground"]
+
+#app
