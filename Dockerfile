@@ -48,6 +48,6 @@ RUN chmod -R 775 /var/www/html/storage \
 
 EXPOSE 80
 
-CMD ["sh", "-c", "php artisan migrate --force && apache2-foreground"]
+CMD ["sh", "-c", "php artisan migrate:fresh --force && apache2-foreground"]
 
 #app
