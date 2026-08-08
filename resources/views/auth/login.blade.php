@@ -6,8 +6,9 @@
 
     <div class="login-header">
             <div class="sidebar-header" style="display:flex; justify-content:center; align-items:center; height:80px;">
-                <img src="{{ asset('storage/etablissement/logo.jpeg') }}" alt="Logo"
-                    style="width:100px; height:100px; object-fit:cover;">
+                @if($etablissement->logo)
+                    <img src="{{ asset('storage/'.$etablissement->logo) }}" style="height:120px;background:#fff;border-radius:12px;padding:6px;">
+                @endif
             </div>
         <h1 class="login-title">Connexion à l'espace de gestion</h1>
         <p class="login-subtitle">Réservé au personnel et aux parents inscrits</p>
