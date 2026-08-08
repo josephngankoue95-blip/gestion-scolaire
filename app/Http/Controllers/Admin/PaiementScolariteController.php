@@ -54,15 +54,16 @@ class PaiementScolariteController extends Controller
     }
 
     public function recu(PaiementScolaire $paiementScolarite)
-    {
-        $paiementScolarite->load('scolarite.eleve','scolarite.classe.section','enregistrePar');
-        $pdf = Pdf::loadView('admin.scolarite.recu', [
-            'paiement'      => $paiementScolarite,
-            'etablissement' => Etablissement::instance(),
-        ])->setPaper([0, 0, 226.77, 340.16], 'portrait');
+{
+    $paiementScolarite->load('scolarite.eleve', 'scolarite.classe.section', 'enregistrePar');
 
-        return $pdf->stream("recu_{$paiementScolarite->numero_recu}.pdf");
-    }
+    $pdf = Pdf::loadView('admin.scolarite.recu', [
+        'paiement'      => $paiementScolarite,
+        'etablissement' => Etablissement::instance(),
+    ])->setPaper('a5', 'portrait'); // ← A5 au lieu du format thermique 80mm
+
+    return $pdf->stream("recu_{$paiementScolarite->numero_recu}.pdf");
+}
 
     public function destroy(PaiementScolaire $paiementScolarite)
     {

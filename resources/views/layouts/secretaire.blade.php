@@ -10,8 +10,9 @@
 <div class="app-layout">
     <aside id="sidebar" class="sidebar">
         <div class="sidebar-header">
-            <div class="sidebar-logo">SC</div>
-            <span class="sidebar-brand">Secrétariat</span>
+         <img src="{{ asset('storage/' . $etablissement->logo) }}" 
+                style="height:50px;border-radius:200px;display:block;margin:0 auto;" 
+                alt="Logo">
         </div>
         <nav class="sidebar-nav">
             <a href="{{ route('secretaire.dashboard') }}" class="sidebar-link {{ request()->routeIs('secretaire.dashboard') ? 'sidebar-link-active' : '' }}">

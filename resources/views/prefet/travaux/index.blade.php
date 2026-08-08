@@ -37,8 +37,10 @@
                         @endif
                     </td>
                     <td class="text-right">
-                        <a href="{{ route('prefet.travaux.show', $td) }}" class="login-link mr-2">Voir</a>
-                        <a href="{{ route('prefet.travaux.imprimer', $td) }}" target="_blank" class="login-link">Imprimer</a>
+                        <a href="{{ route('prefet.travaux.show', $td) }}" class="login-link mr-2">
+                            <i data-lucide="eye" class="w-5 h-5"></i>
+                        </a>
+                        
                     </td>
                 </tr>
                 @empty

@@ -10,10 +10,9 @@
 <div class="app-layout">
     <aside id="sidebar" class="sidebar">
         <div class="sidebar-header">
-        <div class="sidebar-header" style="display:flex; justify-content:center; align-items:center; height:80px;">
-            <img src="{{ asset('storage/etablissement/logo.jpeg') }}" alt="Logo"
-            style="width:60px; height:60px; object-fit:cover; border-radius:50%;">
-        </div>
+            <img src="{{ asset('storage/' . $etablissement->logo) }}" 
+                style="height:50px;border-radius:200px;display:block;margin:0 auto;" 
+                alt="Logo">
         </div>
 
 

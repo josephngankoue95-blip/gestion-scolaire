@@ -19,54 +19,28 @@ use App\Imports\ElevesImport;
 class EleveController extends Controller
 {
     public function index(Request $request)
-{
-    // Année scolaire active
-    $annee = AnneeScolaire::getActive();
+    {
+        $classes = ClasseModel::where('annee_scolaire_id', AnneeScolaire::getActive()?->id)
+            ->with('section')->orderBy('nom')->get();
 
-    // Liste des classes de l'année active
-    $classes = ClasseModel::where('annee_scolaire_id', $annee?->id)
-        ->orderBy('nom')
-        ->get();
+        $query = Eleve::with('classe.section');
 
-    // Construction de la requête
-$query = Eleve::whereHas('scolarites', function ($q) use ($annee, $request) {
+        // ── Filtre classe — vérifié explicitement ──
+        if ($request->filled('classe_id')) {
+            $query->where('classe_id', $request->classe_id);
+        }
+        if ($request->filled('statut')) {
+            $query->where('statut', $request->statut);
+        }
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $query->where(fn($q) => $q->where('nom','like',"%{$s}%")->orWhere('prenom','like',"%{$s}%")->orWhere('matricule','like',"%{$s}%"));
+        }
 
-    $q->where('annee_scolaire_id', $annee->id);
+        $eleves = $query->orderBy('nom')->paginate(20)->withQueryString();
 
-    if ($request->filled('classe_id')) {
-        $q->where('classe_id', $request->classe_id);
+        return view('admin.eleves.index', compact('eleves', 'classes'));
     }
-
-});
-
-    // Filtre par classe
-    if ($request->filled('classe_id')) {
-        $query->where('classe_id', $request->classe_id);
-    } else {
-        // Au premier chargement, ne rien afficher
-        $query->whereRaw('1 = 0');
-    }
-
-    // Recherche
-    if ($request->filled('search')) {
-        $search = trim($request->search);
-
-        $query->where(function ($q) use ($search) {
-            $q->where('nom', 'like', "%{$search}%")
-              ->orWhere('prenom', 'like', "%{$search}%")
-              ->orWhere('matricule', 'like', "%{$search}%");
-        });
-    }
-
-    // Récupération des élèves
-    $eleves = $query
-        ->orderBy('nom')
-        ->orderBy('prenom')
-        ->paginate(15)
-        ->withQueryString();
-
-    return view('admin.eleves.index', compact('eleves', 'classes'));
-}
 
 
 public function create()
@@ -88,6 +62,7 @@ public function create()
         'sexe'             => 'required|in:M,F',
         'telephone_parent' => 'nullable|string|max:20',
         'adresse'          => 'nullable|string|max:255',
+        'classe_id'        => 'required|exists:classes,id',
         'photo'            => 'nullable|image|max:2048',
 
         // Compte parent

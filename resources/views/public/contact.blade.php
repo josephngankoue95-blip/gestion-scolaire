@@ -23,25 +23,22 @@
 
             <div class="card">
                 <div class="label">Adresse</div>
-                <div class="value">Douala, Cameroun</div>
+                {{ $etablissement->adresse }}
             </div>
 
             <div class="card">
                 <div class="label">Téléphone / WhatsApp</div>
-                <div class="value">+237 691 975 928</div>
+                {{ $etablissement->telephone }}
             </div>
 
             <div class="card">
                 <div class="label">Email</div>
-                <div class="value">contact@etablissement.cm</div>
+                {{ $etablissement->email }}
             </div>
 
             <div class="card">
                 <div class="label">Horaires d'ouverture</div>
-                <div class="value">
-                    Lundi — Vendredi : 7h30 — 16h00<br>
-                    Samedi : 8h00 — 12h00
-                </div>
+                {{ $etablissement->horaires }}
             </div>
 
         </div>
